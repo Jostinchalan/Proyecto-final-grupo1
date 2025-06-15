@@ -51,3 +51,27 @@ o Registro de cuentos leídos, duración de lectura o escucha.
 o Generación de informes sobre hábitos y preferencias lectoras.
 
 
+## Instrucciones de instalación y ejecución
+
+1. Crear y activar entorno virtual:
+
+```bash
+python -m venv venv
+
+# En Windows PowerShell
+.\venv\Scripts\activate
+
+# En Linux/macOS
+source venv/bin/activate
+
+#instalar dependencias 
+pip install -r requirements.txt
+
+#realizar migraciones 
+python manage.py makemigrations
+python manage.py migrate
+
+#ejecutar servidor 
+python manage.py runserver
+
+
