@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CuentIA - Cuentos Personalizados con IA</title>
+    <link rel="stylesheet" href="{% static 'css/styles_landing.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="landing-container">
+        <!-- Estrellas decorativas -->
+        <div class="landing-stars">
+            <div class="star" style="top: 10%; left: 20%; font-size: 24px;">✦</div>
+            <div class="star" style="top: 30%; left: 80%; font-size: 18px;">✧</div>
+            <div class="star" style="top: 60%; left: 15%; font-size: 20px;">✦</div>
+            <div class="star" style="top: 25%; left: 50%; font-size: 22px;">✧</div>
+            <div class="star" style="top: 70%; left: 70%; font-size: 26px;">✦</div>
+        </div>
+
+        <!-- Header -->
+        <header class="landing-header">
+            <div class="landing-logo">
+                <img src="{% static 'images/robot4.png' %}" alt="CuentIA Logo">
+                <h1>CuentIA</h1>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main class="landing-main">
+            <div class="landing-content">
+                <h2 class="landing-title">Cuentos <br>personalizados <br>con magia de IA</h2>
+                <p class="landing-description">
+                    Cuentos infantiles personalizados creados con <br>inteligencia artificial para inspirar la imaginación de los más pequeños
+                </p>
+                <div class="landing-buttons">
+                    <a href="{% url 'user:register' %}" class="landing-button-primary">Registrarse</a>
+                    <a href="{% url 'user:login' %}" class="landing-button-secondary">Iniciar sesión</a>
+                </div>
+                <h3 class="landing-features-title">¡Descubre la magia de CuentosIA!</h3>
+                <div class="landing-features-grid">
+                    <div class="landing-feature-card">
+                        <div class="landing-feature-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="landing-feature-title">Personalización</h4>
+                        <p class="landing-feature-description">
+                            Crea cuentos adaptados a los intereses de cada niño y transmite los mensajes que deseas transmitir
+                        </p>
+                    </div>
+                    <div class="landing-feature-card">
+                        <div class="landing-feature-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                    <line x1="12" y1="19" x2="12" y2="22"></line>
+                                </svg>
+                        </div>
+                        <h4 class="landing-feature-title">Audio Narración</h4>
+                        <p class="landing-feature-description">
+                            Escucha los cuentos narrados con voces naturales gracias a nuestra tecnología de texto a voz
+                        </p>
+                    </div>
+                    <div class="landing-feature-card">
+                        <div class="landing-feature-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                </svg>
+                        </div>
+                        <h4 class="landing-feature-title">Biblioteca Personal</h4>
+                        <p class="landing-feature-description">
+                            Guarda todos los cuentos creados en tu biblioteca personal para acceder cuando quieras
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="landing-image">
+                <img src="{% static 'images/robot4.png' %}" alt="Robot CuentIA">
+            </div>
+        </main>
+    </div>
+</body>
+</html>

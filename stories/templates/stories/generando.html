@@ -1,0 +1,485 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="generando-container">
+    <div class="generando-animation">
+        <div class="magic-circle"></div>
+        <div class="generando-icon">🪄</div>
+    </div>
+
+    <h1 class="generando-title">Creando tu cuento mágico...</h1>
+    <p class="generando-subtitle">
+        Nuestra IA está tejiendo una historia única y personalizada especialmente para ti.
+        ¡La magia está sucediendo en este momento!
+    </p>
+
+    <div class="generando-details">
+        <div class="detail-item">
+            <span class="detail-label">
+                👤 Personaje:
+            </span>
+            <span class="detail-value">{{ datos_formulario.personaje_principal }}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">
+                🎭 Tema:
+            </span>
+            <span class="detail-value">{{ datos_formulario.tema|title }}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">
+                🎂 Edad:
+            </span>
+            <span class="detail-value">{{ datos_formulario.edad }}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">
+                📏 Longitud:
+            </span>
+            <span class="detail-value">{{ datos_formulario.longitud|title }}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">
+                📊 Estado:
+            </span>
+            <span class="detail-value status-indicator status-{{ cuento.estado }}" id="estado-actual">
+                {{ cuento.estado|title }}
+            </span>
+        </div>
+    </div>
+
+    <div class="progress-steps">
+        <div class="step completed">
+            <div class="step-icon">✓</div>
+            <div>
+                <div class="step-text">Procesando información</div>
+                <div class="step-description">Analizando los datos del formulario</div>
+            </div>
+        </div>
+        <div class="step active" id="step-generating">
+            <div class="step-icon">🤖</div>
+            <div>
+                <div class="step-text">Generando historia con IA</div>
+                <div class="step-description">Creando el contenido del cuento</div>
+            </div>
+        </div>
+        <div class="step pending" id="step-image">
+            <div class="step-icon">🎨</div>
+            <div>
+                <div class="step-text">Creando ilustración mágica</div>
+                <div class="step-description">Generando imagen personalizada</div>
+            </div>
+        </div>
+        <div class="step pending" id="step-final">
+            <div class="step-icon">📚</div>
+            <div>
+                <div class="step-text">Finalizando cuento</div>
+                <div class="step-description">Preparando la presentación</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="estimated-time">
+        ⏱️ Tiempo estimado: 30-60 segundos
+    </div>
+
+    <!-- Debug Info -->
+    <div class="debug-info">
+        <h4>🔍 Información de Debug:</h4>
+        <div>ID del Cuento: {{ cuento.id }}</div>
+        <div>Usuario: {{ cuento.usuario.username }}</div>
+        <div>Estado Actual: <span id="debug-estado">{{ cuento.estado }}</span></div>
+        <div>Última Verificación: <span id="ultima-verificacion">Iniciando...</span></div>
+        <div>Intentos de Verificación: <span id="intentos-verificacion">0</span></div>
+    </div>
+</div>
+
+<style>
+/* Usar variables CSS del modo oscuro */
+.generando-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 120px);
+    text-align: center;
+    padding: 2rem;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.generando-animation {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.magic-circle {
+    width: 100%;
+    height: 100%;
+    border: 4px solid transparent;
+    border-top: 4px solid #7c3aed;
+    border-right: 4px solid #8b5cf6;
+    border-radius: 50%;
+    animation: spin 2s linear infinite;
+    position: relative;
+}
+
+.magic-circle::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 80%;
+    border: 2px solid transparent;
+    border-bottom: 2px solid #a78bfa;
+    border-left: 2px solid #c4b5fd;
+    border-radius: 50%;
+    animation: spin 1.5s linear infinite reverse;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.generando-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+.generando-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #7c3aed;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.generando-subtitle {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 3rem;
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+.generando-details {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    max-width: 500px;
+    width: 100%;
+    margin-bottom: 3rem;
+    border: 1px solid var(--border-color);
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.detail-value {
+    color: #7c3aed;
+    font-weight: 600;
+    background: #f3e8ff;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.progress-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 500px;
+    width: 100%;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+.step.active {
+    background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+    border: 2px solid #7c3aed;
+    transform: translateX(10px);
+}
+
+.step.completed {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 2px solid #10b981;
+}
+
+.step-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.step.active .step-icon {
+    background: #7c3aed;
+    color: white;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.step.completed .step-icon {
+    background: #10b981;
+    color: white;
+}
+
+.step.pending .step-icon {
+    background: var(--hover-bg);
+    color: var(--text-secondary);
+}
+
+.step-text {
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+}
+
+.step-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.estimated-time {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 2rem;
+    color: #92400e;
+    font-weight: 600;
+}
+
+.debug-info {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 2rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-align: left;
+}
+
+.debug-info h4 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.status-indicator {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+
+.status-generando {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-completado {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .generando-container {
+        padding: 1rem;
+    }
+
+    .generando-title {
+        font-size: 2rem;
+    }
+
+    .generando-details {
+        padding: 1.5rem;
+    }
+}
+</style>
+
+<script>
+let currentStep = 1;
+let checkInterval;
+let intentosVerificacion = 0;
+const maxIntentos = 60; // 5 minutos máximo
+
+// Simular progreso de pasos
+function updateSteps() {
+    const steps = document.querySelectorAll('.step');
+
+    if (currentStep < steps.length) {
+        // Marcar paso actual como completado
+        if (currentStep > 0) {
+            steps[currentStep - 1].classList.remove('active');
+            steps[currentStep - 1].classList.add('completed');
+            steps[currentStep - 1].querySelector('.step-icon').textContent = '✓';
+        }
+
+        // Activar siguiente paso
+        if (currentStep < steps.length) {
+            steps[currentStep].classList.remove('pending');
+            steps[currentStep].classList.add('active');
+        }
+
+        currentStep++;
+    }
+}
+
+// Auto-refresh para verificar si el cuento está listo
+function checkCuentoStatus() {
+    const cuentoId = {{ cuento.id }};
+    intentosVerificacion++;
+
+    console.log(`🔍 Verificación #${intentosVerificacion} del cuento ${cuentoId}`);
+
+    // Actualizar UI
+    document.getElementById('intentos-verificacion').textContent = intentosVerificacion;
+    document.getElementById('ultima-verificacion').textContent = new Date().toLocaleTimeString();
+
+    // Verificar límite de intentos
+    if (intentosVerificacion > maxIntentos) {
+        console.error('❌ Tiempo límite excedido');
+        clearInterval(checkInterval);
+        alert('El proceso está tomando más tiempo del esperado. Serás redirigido para intentar de nuevo.');
+        window.location.href = '/stories/generar/';
+        return;
+    }
+
+    fetch(`/stories/cuento/${cuentoId}/status/`, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        console.log(`📡 Response status: ${response.status}`);
+        return response.json();
+    })
+    .then(data => {
+        console.log('📊 Response data:', data);
+
+        // Actualizar estado en UI
+        document.getElementById('debug-estado').textContent = data.estado;
+        document.getElementById('estado-actual').textContent = data.estado.charAt(0).toUpperCase() + data.estado.slice(1);
+        document.getElementById('estado-actual').className = `detail-value status-indicator status-${data.estado}`;
+
+        if (data.completado) {
+            console.log('✅ Cuento completado, redirigiendo...');
+
+            // Completar todos los pasos
+            const steps = document.querySelectorAll('.step');
+            steps.forEach(step => {
+                step.classList.remove('active', 'pending');
+                step.classList.add('completed');
+                step.querySelector('.step-icon').textContent = '✓';
+            });
+
+            // Limpiar interval
+            clearInterval(checkInterval);
+
+            // Redirigir al cuento completado
+            setTimeout(() => {
+                window.location.href = `/stories/cuento/${cuentoId}/`;
+            }, 1000);
+
+        } else if (data.error) {
+            console.error('❌ Error en la generación');
+            clearInterval(checkInterval);
+            alert('Hubo un error generando el cuento. Serás redirigido para intentar de nuevo.');
+            window.location.href = '/stories/generar/';
+        }
+    })
+    .catch(error => {
+        console.error('❌ Error checking status:', error);
+        // No detener el proceso por errores de red, seguir intentando
+    });
+}
+
+// Inicializar verificaciones
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Página de generación cargada');
+
+    // Actualizar pasos cada 8 segundos
+    setInterval(updateSteps, 8000);
+
+    // Verificar estado del cuento cada 3 segundos
+    checkInterval = setInterval(checkCuentoStatus, 3000);
+
+    // Verificación inicial después de 2 segundos
+    setTimeout(checkCuentoStatus, 2000);
+});
+
+// Limpiar interval cuando se abandone la página
+window.addEventListener('beforeunload', function() {
+    if (checkInterval) {
+        clearInterval(checkInterval);
+    }
+});
+</script>
+{% endblock %}

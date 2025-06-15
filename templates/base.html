@@ -1,0 +1,893 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" {% if user.settings.dark_mode %}class="dark-mode"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard - CuentIA{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles_landing.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+    <style>
+        /* Variables CSS para modo claro y oscuro */
+        :root {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-sidebar: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #e5e7eb;
+            --card-bg: #ffffff;
+            --input-bg: #ffffff;
+            --hover-bg: #f3f4f6;
+            --highlight-color: #8b5cf6;
+            --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --settings-content-bg: #ffffff;
+            --settings-header-bg: #8b5cf6;
+        }
+
+        /* Variables para modo oscuro */
+        html.dark-mode {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-sidebar: #1e1e1e;
+            --text-primary: #f5f5f5;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+            --card-bg: #2d2d2d;
+            --input-bg: #3a3a3a;
+            --hover-bg: #3a3a3a;
+            --highlight-color: #8b5cf6;
+            --shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            --settings-content-bg: #2d3748;
+            --settings-header-bg: #8b5cf6;
+        }
+
+        /* Aplicar variables a todos los elementos */
+        body {
+            background-color: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+            transition: all 0.3s ease;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Dashboard container - MODIFICADO para ser flexible */
+        .dashboard-container {
+            background-color: var(--bg-primary) !important;
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* Main content - MODIFICADO para ajustarse cuando no hay sidebar derecho */
+        .main-content {
+            background-color: var(--bg-primary) !important;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        /* NUEVO: Clase para cuando hay sidebar derecho */
+        .dashboard-container.with-right-sidebar .main-content {
+            width: calc(100% - 600px); /* 280px izquierdo + 320px derecho */
+        }
+
+        /* NUEVO: Clase para cuando NO hay sidebar derecho */
+        .dashboard-container.without-right-sidebar .main-content {
+            width: calc(100% - 280px); /* Solo 280px izquierdo */
+        }
+
+        /* Sidebar izquierdo */
+        .sidebar {
+            background-color: var(--bg-sidebar) !important;
+            border-right: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+            width: 280px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar .logo {
+            color: var(--text-primary) !important;
+            display: flex;
+            align-items: center;
+            padding: 1.5rem 1rem;
+            gap: 0.5rem;
+        }
+
+        .sidebar .logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .sidebar .logo h1 {
+            color: var(--text-primary) !important;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .sidebar .menu-section {
+            padding: 0 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar .menu-section h2 {
+            color: var(--text-secondary) !important;
+            font-size: 0.75rem;
+            margin-bottom: 0.75rem;
+            padding-left: 0.5rem;
+        }
+
+        .sidebar .menu-section nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .sidebar .menu-section nav a {
+            color: var(--text-primary) !important;
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .menu-section nav a:hover {
+            background-color: var(--hover-bg) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .sidebar .menu-section nav a.active {
+            background-color: var(--highlight-color) !important;
+            color: white !important;
+        }
+
+        /* Barra superior */
+        .top-bar {
+            background-color: var(--bg-secondary) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            box-shadow: var(--shadow);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-bar input {
+            background-color: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-color) !important;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            width: 100%;
+            font-size: 0.875rem;
+        }
+
+        .search-bar input::placeholder {
+            color: var(--text-secondary) !important;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-profile span {
+            color: var(--text-primary) !important;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .user-profile .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--highlight-color);
+        }
+
+        .user-profile .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Contenido del dashboard */
+        .dashboard-content {
+            background-color: var(--bg-primary) !important;
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Welcome banner */
+        .welcome-banner {
+            background-color: var(--card-bg) !important;
+            color: white !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .welcome-banner h1 {
+            color: white !important;
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-size: 1.75rem;
+        }
+
+        .welcome-banner p {
+            color: white !important;
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        /* Secciones */
+        .section {
+            background-color: var(--bg-primary) !important;
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-header h2 {
+            color: var(--text-primary) !important;
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .controls button {
+            background-color: var(--card-bg) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-color) !important;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .controls button:hover {
+            background-color: var(--hover-bg) !important;
+        }
+
+        /* Story cards */
+        .story-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .story-card {
+            background-color: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: var(--shadow);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .story-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .story-card .story-image {
+            height: 160px;
+            position: relative;
+        }
+
+        .story-card .story-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .story-card .tags {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        .story-card .tags span {
+            background-color: var(--highlight-color) !important;
+            color: white !important;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.625rem;
+            font-weight: 600;
+        }
+
+        .story-card .story-info {
+            padding: 1rem;
+        }
+
+        .story-card .story-info h3 {
+            color: var(--text-primary) !important;
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .story-card .story-info p {
+            color: var(--text-secondary) !important;
+            margin: 0 0 0.75rem 0;
+            font-size: 0.75rem;
+        }
+
+        .story-card .author {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .story-card .author span {
+            color: var(--text-secondary) !important;
+            font-size: 0.75rem;
+        }
+
+        /* Popular stories */
+        .popular-stories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .popular-story-card {
+            background-color: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: var(--shadow);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .popular-story-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .popular-story-card h3 {
+            color: var(--text-primary) !important;
+            margin: 0 0 0.25rem 0;
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .popular-story-card p {
+            color: var(--text-secondary) !important;
+            margin: 0;
+            font-size: 0.75rem;
+        }
+
+        .popular-story-icon {
+            color: var(--text-primary) !important;
+            flex-shrink: 0;
+        }
+
+        .popular-story-info {
+            flex: 1;
+        }
+
+        /* Sidebar derecho */
+        .right-sidebar {
+            background-color: var(--bg-sidebar) !important;
+            border-left: 1px solid var(--border-color) !important;
+            width: 320px;
+            flex-shrink: 0;
+            padding: 2rem 1rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        /* User card */
+        .user-card {
+            background-color: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: var(--shadow);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .user-card-header {
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto;
+            border: 3px solid var(--highlight-color);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-card h3 {
+            color: white !important;
+            margin: 0 0 0.5rem 0;
+            font-size: 1.125rem;
+        }
+
+        .user-card p {
+            color: white !important;
+            margin: 0;
+            font-size: 0.875rem;
+        }
+
+        /* Stats card */
+        .stats-card {
+            background-color: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: var(--shadow);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .stats-card-header h3 {
+            color: var(--text-primary) !important;
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .stats-card-header svg {
+            color: var(--text-primary) !important;
+        }
+
+        .stats-card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary) !important;
+        }
+
+        .stat-icon {
+            width: 28px;
+            height: 28px;
+            background-color: var(--highlight-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-info p {
+            color: var(--text-secondary) !important;
+            margin: 0;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            color: var(--text-primary) !important;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        /* Chart card */
+        .chart-card {
+            background-color: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: var(--shadow);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+        }
+
+        .chart-card h3 {
+            color: var(--text-primary) !important;
+            margin: 0 0 1.25rem 0;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .chart {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 150px;
+        }
+
+        .chart-bar {
+            width: 18%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-bar-value {
+            width: 100%;
+            background-color: var(--highlight-color);
+            border-radius: 0.25rem 0.25rem 0 0;
+        }
+
+        .chart-bar-label {
+            color: var(--text-secondary) !important;
+            font-size: 0.75rem;
+        }
+
+        /* Welcome message */
+        .welcome-message {
+            background-color: var(--card-bg) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .welcome-message p {
+            color: var(--text-primary) !important;
+            margin: 0;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* Scrollbars para modo oscuro */
+        html.dark-mode ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        html.dark-mode ::-webkit-scrollbar-track {
+            background: var(--bg-sidebar);
+        }
+
+        html.dark-mode ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        html.dark-mode ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Asegurar que todos los elementos hereden los colores */
+        html.dark-mode * {
+            border-color: var(--border-color) !important;
+        }
+
+        /* Específico para inputs y selects */
+        html.dark-mode input,
+        html.dark-mode select,
+        html.dark-mode textarea {
+            background-color: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        html.dark-mode input::placeholder {
+            color: var(--text-secondary) !important;
+        }
+
+        /* Botones */
+        html.dark-mode button:not(.save-button):not(.avatar-button):not(.save-avatar-button):not(.cancel-avatar-button) {
+            background-color: var(--card-bg) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        html.dark-mode button:not(.save-button):not(.avatar-button):not(.save-avatar-button):not(.cancel-avatar-button):hover {
+            background-color: var(--hover-bg) !important;
+        }
+
+        /* Estilos específicos para la página de configuraciones */
+        .settings-container {
+            background-color: var(--bg-primary) !important;
+        }
+
+        .settings-header {
+            background: var(--settings-header-bg) !important;
+            color: white !important;
+        }
+
+        .settings-content {
+            background-color: var(--settings-content-bg) !important;
+            color: var(--text-primary) !important;
+        }
+
+        html.dark-mode .settings-content {
+            background-color: #1e1e1e !important;
+        }
+
+        /* Transiciones suaves */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .dashboard-container.with-right-sidebar .main-content {
+                width: calc(100% - 500px);
+            }
+            .right-sidebar {
+                width: 280px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .dashboard-container.with-right-sidebar .main-content {
+                width: calc(100% - 280px);
+            }
+            .right-sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 240px;
+            }
+            .dashboard-container.with-right-sidebar .main-content,
+            .dashboard-container.without-right-sidebar .main-content {
+                width: calc(100% - 240px);
+            }
+            .dashboard-content {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .sidebar {
+                width: 0;
+                position: fixed;
+                z-index: 100;
+                transform: translateX(-100%);
+            }
+            .dashboard-container.with-right-sidebar .main-content,
+            .dashboard-container.without-right-sidebar .main-content {
+                width: 100%;
+            }
+            .top-bar {
+                padding: 0.5rem 1rem;
+            }
+            .search-bar {
+                max-width: 200px;
+            }
+            .user-profile span {
+                display: none;
+            }
+            .dashboard-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- MODIFICADO: Agregar clase condicional para el sidebar derecho -->
+    <div class="dashboard-container {% if request.resolver_match.url_name == 'dashboard' %}with-right-sidebar{% else %}without-right-sidebar{% endif %}">
+        <!-- Sidebar izquierdo -->
+        <div class="sidebar">
+            <div class="logo">
+                <img src="{% static 'images/robot4.png' %}" alt="CuentIA Logo">
+                <h1>CuentIA</h1>
+            </div>
+
+            <div class="menu-section">
+                <h2>GENERAL</h2>
+                <nav>
+                    <a href="{% url 'dashboard' %}" class="{% if request.path == '/dashboard/' %}active{% endif %}">INICIO</a>
+                    <a href="{% url 'user:create_perfil' %}" class="{% if request.path == '/user/perfiles/crear/' %}active{% endif %}">CREAR PERFIL INFANTIL</a>
+                    <a href="{% url 'stories:generar' %}" class="{% if request.path == '/stories/generar/' %}active{% endif %}">GENERAR CUENTO</a>
+                    <a href="{% url 'library:library' %}" class="{% if request.path == '/library/' %}active{% endif %}">BIBLIOTECA</a>
+                    <a href="{% url 'user:perfil_list' %}" class="{% if request.path == '/user/perfiles/' %}active{% endif %}">PERFILES</a>
+                    <a href="{% url 'library:reading_tracker' %}" class="{% if request.path == '/library/reading-tracker/' %}active{% endif %}">SEGUIMIENTO LECTOR</a>
+                </nav>
+            </div>
+
+            <div class="menu-section">
+                <h2>CONFIGURACIÓN</h2>
+                <nav>
+                    <a href="{% url 'user:settings' %}" class="{% if request.path == '/user/settings/' %}active{% endif %}">CONFIGURACIONES</a>
+                    <a href="{% url 'user:logout' %}">CERRAR SESIÓN</a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="main-content">
+            <!-- Barra superior -->
+            <div class="top-bar">
+                
+                <div class="user-profile">
+                    <span>{{ request.user.username|upper }}</span>
+                    <div class="avatar">
+                        {% if user.settings.avatar %}
+                            <img src="{{ user.settings.avatar.url }}" alt="Avatar">
+                        {% else %}
+                            <img src="{% static 'images/robot4.png' %}" alt="Avatar">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido del dashboard -->
+            <div class="dashboard-content">
+                {% block content %}
+                <!-- Aquí va el contenido específico de cada página -->
+                {% endblock %}
+            </div>
+        </div>
+
+        <!-- MODIFICADO: Sidebar derecho solo aparece en dashboard -->
+        {% if request.resolver_match.url_name == 'dashboard' %}
+        <div class="right-sidebar">
+            <!-- Perfil de usuario -->
+            <div class="user-card">
+                <div class="user-card-header">
+                    <div class="user-avatar">
+                        {% if user.settings.avatar %}
+                            <img src="{{ user.settings.avatar.url }}" alt="Avatar">
+                        {% else %}
+                            <img src="{% static 'images/robot4.png' %}" alt="Avatar">
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="user-card-content">
+                    <h3>BUENOS DÍAS {{ request.user.username|upper }}</h3>
+                    <p>DISFRUTA LA NARRACIÓN DE CUENTOS PERSONALIZADOS</p>
+                </div>
+            </div>
+
+            <!-- Estadísticas rápidas -->
+            <div class="stats-card">
+                <div class="stats-card-header">
+                    <h3>ESTADÍSTICAS RÁPIDAS</h3>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 20V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 20V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 20V14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="stats-card-content">
+                    <div class="stat-item">
+                        <div class="stat-icon">1</div>
+                        <div class="stat-info">
+                            <p>TOTAL DE CUENTOS</p>
+                        </div>
+                        <div class="stat-value">{{ total_cuentos|default:"0" }}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">2</div>
+                        <div class="stat-info">
+                            <p>CUENTOS DE ESTE MES</p>
+                        </div>
+                        <div class="stat-value">{{ cuentos_este_mes|default:"0" }}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">3</div>
+                        <div class="stat-info">
+                            <p>TIEMPO DE LECTURA</p>
+                        </div>
+                        <div class="stat-value">{{ tiempo_lectura|default:"0h 0m" }}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">4</div>
+                        <div class="stat-info">
+                            <p>TEMA FAVORITO</p>
+                        </div>
+                        <div class="stat-value">{{ tema_favorito|default:"AVENTURA" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de actividad -->
+            <div class="chart-card">
+                <h3>ACTIVIDAD MENSUAL</h3>
+                <div class="chart">
+                    <div class="chart-bar">
+                        <div class="chart-bar-value" style="height: 30%;"></div>
+                        <div class="chart-bar-label">S1</div>
+                    </div>
+                    <div class="chart-bar">
+                        <div class="chart-bar-value" style="height: 45%;"></div>
+                        <div class="chart-bar-label">S2</div>
+                    </div>
+                    <div class="chart-bar">
+                        <div class="chart-bar-value" style="height: 60%;"></div>
+                        <div class="chart-bar-label">S3</div>
+                    </div>
+                    <div class="chart-bar">
+                        <div class="chart-bar-value" style="height: 75%;"></div>
+                        <div class="chart-bar-label">S4</div>
+                    </div>
+                    <div class="chart-bar">
+                        <div class="chart-bar-value" style="height: 90%;"></div>
+                        <div class="chart-bar-label">S5</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Función para aplicar el modo oscuro desde las configuraciones del usuario
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar si el usuario tiene modo oscuro activado
+            const htmlElement = document.documentElement;
+            const isDarkMode = htmlElement.classList.contains('dark-mode');
+
+            if (isDarkMode) {
+                console.log('Modo oscuro aplicado desde el servidor');
+            }
+
+            // Función para toggle manual del modo oscuro (para testing)
+            window.toggleDarkMode = function() {
+                htmlElement.classList.toggle('dark-mode');
+                console.log('Modo oscuro toggled:', htmlElement.classList.contains('dark-mode'));
+            };
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrarse - CuentIA</title>
+    <link rel="stylesheet" href="{% static 'css/styles_landing.css' %}">
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-image">
+            <img src="{% static 'images/robot4.png' %}" alt="Ilustración">
+        </div>
+        <div class="auth-content">
+            <div class="auth-logo">
+                <img src="{% static 'images/robot4.png' %}" alt="CuentIA Logo">
+                <h1>CuentIA</h1>
+            </div>
+            <div class="auth-form-container">
+                <h2 class="auth-title">Registrarse</h2>
+                <p class="auth-subtitle">Crea una cuenta para continuar</p>
+
+                <!-- Eliminamos los mensajes globales, ya no se muestran arriba -->
+                <!-- Si necesitas mostrar mensajes generales de éxito, hazlo solo después de un registro exitoso -->
+
+                <form method="post" class="auth-form">
+                    {% csrf_token %}
+
+                    <!-- Iterar a través de los campos del formulario -->
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+
+                            {% if field.name == "password1" or field.name == "password2" %}
+                                <!-- Si el campo es password1 o password2, agregamos el botón de ver/ocultar -->
+                                <div class="password-input-container">
+                                    {{ field }}
+                                    <button type="button" class="password-toggle">👁️</button>
+                                </div>
+                            {% else %}
+                                {{ field }}
+                            {% endif %}
+
+                            <!-- Mostrar errores debajo de cada campo -->
+                            {% if field.errors %}
+                                <span class="field-error">{{ field.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit" class="auth-button">Registrarse</button>
+                </form>
+
+                <div class="auth-divider">o</div>
+
+                <div class="auth-footer">
+                    <p>¿Ya tienes una cuenta? <a href="{% url 'user:login' %}" class="auth-link">Iniciar sesión</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Script para mostrar/ocultar contraseña
+        document.querySelectorAll('.password-toggle').forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.parentNode.querySelector('input');
+                if (input.type === 'password') {
+                    input.type = 'text';  // Muestra la contraseña
+                    this.textContent = '🔒';  // Cambia el ícono a un candado cerrado
+                } else {
+                    input.type = 'password';  // Oculta la contraseña
+                    this.textContent = '👁️';  // Cambia el ícono a un ojo abierto
+                }
+            });
+        });
+    </script>
+</body>
+</html>

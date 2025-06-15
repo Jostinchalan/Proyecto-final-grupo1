@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/library.css' %}?v=5">
+<!-- Asegurar que FontAwesome esté cargado -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="biblioteca-container">
+    <div class="biblioteca-header">
+        <h1 class="biblioteca-title">BIBLIOTECA DE CUENTOS</h1>
+    </div>
+
+    <!-- Filtros -->
+    <div class="biblioteca-filters">
+        <form method="GET" id="filtros-form" class="filters-form">
+            {% csrf_token %}
+            <div class="filters-row">
+                <!-- Perfil del Niño -->
+                <div class="filter-group">
+                    <label for="perfil">PERFIL DEL NIÑO</label>
+                    <select name="perfil" id="perfil" class="filter-select">
+                        <option value="todos" {% if not filtros_actuales.perfil_id or filtros_actuales.perfil_id == 'todos' %}selected{% endif %}>
+                            TODOS LOS PERFILES
+                        </option>
+                        {% for perfil in perfiles %}
+                        <option value="{{ perfil.id }}" {% if filtros_actuales.perfil_id == perfil.id|stringformat:"s" %}selected{% endif %}>
+                            {{ perfil.nombre|upper }} ({{ perfil.edad }} años)
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Título del Cuento -->
+                <div class="filter-group">
+                    <label for="titulo">TÍTULO DEL CUENTO</label>
+                    <input type="text"
+                           name="titulo"
+                           id="titulo"
+                           class="filter-input"
+                           placeholder="Buscar por título..."
+                           value="{{ filtros_actuales.titulo|default:'' }}">
+                </div>
+            </div>
+
+            <div class="filters-row">
+                <!-- Tema -->
+                <div class="filter-group">
+                    <label for="tema">TEMA</label>
+                    <select name="tema" id="tema" class="filter-select">
+                        <option value="todos" {% if not filtros_actuales.tema or filtros_actuales.tema == 'todos' %}selected{% endif %}>
+                            TODOS LOS TEMAS
+                        </option>
+                        {% for tema in temas_disponibles %}
+                        <option value="{{ tema }}" {% if filtros_actuales.tema == tema %}selected{% endif %}>
+                            {{ tema|upper }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Ordenar Por -->
+                <div class="filter-group">
+                    <label for="ordenar_por">ORDENAR POR:</label>
+                    <select name="ordenar_por" id="ordenar_por" class="filter-select">
+                        <option value="fecha" {% if filtros_actuales.ordenar_por == 'fecha' or not filtros_actuales.ordenar_por %}selected{% endif %}>
+                            MÁS RECIENTES
+                        </option>
+                        <option value="dia" {% if filtros_actuales.ordenar_por == 'dia' %}selected{% endif %}>
+                            ÚLTIMO DÍA
+                        </option>
+                        <option value="semana" {% if filtros_actuales.ordenar_por == 'semana' %}selected{% endif %}>
+                            ÚLTIMA SEMANA
+                        </option>
+                        <option value="mes" {% if filtros_actuales.ordenar_por == 'mes' %}selected{% endif %}>
+                            ÚLTIMO MES
+                        </option>
+                        <option value="año" {% if filtros_actuales.ordenar_por == 'año' %}selected{% endif %}>
+                            ÚLTIMO AÑO
+                        </option>
+                        <option value="favoritos" {% if filtros_actuales.ordenar_por == 'favoritos' %}selected{% endif %}>
+                            FAVORITOS
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filters-actions">
+                <a href="{% url 'library:library' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Limpiar Filtros
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Resultados -->
+    <div class="biblioteca-results">
+        <div class="results-header">
+            <h3>Resultados: {{ total_cuentos }} cuento{{ total_cuentos|pluralize }}</h3>
+            {% if perfil_seleccionado %}
+            <p class="perfil-info">Mostrando cuentos de: <strong>{{ perfil_seleccionado.nombre }}</strong></p>
+            {% endif %}
+        </div>
+
+        {% if cuentos %}
+        <div class="biblioteca-grid">
+            {% for cuento in cuentos %}
+            <div class="biblioteca-card">
+                <div class="card-image">
+                    {% if cuento.imagen_url %}
+                        <img src="{{ cuento.imagen_url }}" alt="{{ cuento.titulo }}" class="cuento-image">
+                    {% else %}
+                        <div class="cuento-placeholder">
+                            <i class="fas fa-book"></i>
+                        </div>
+                    {% endif %}
+
+                    <div class="card-badges">
+                        <span class="badge">{{ cuento.get_tema_display|upper }}</span>
+                        {% if cuento.perfil %}
+                        <span class="badge badge-perfil">{{ cuento.perfil.nombre|upper }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-actions">
+                        <!-- REMOVIDO onclick - Ahora manejado por event listeners -->
+                        <button class="card-action-btn favorite-btn {% if cuento.es_favorito %}active{% endif %}"
+                                data-cuento-id="{{ cuento.id }}"
+                                title="{% if cuento.es_favorito %}Quitar de favoritos{% else %}Añadir a favoritos{% endif %}">
+                            <i class="{% if cuento.es_favorito %}fas{% else %}far{% endif %} fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-content">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ cuento.titulo|upper }}</h3>
+                    </div>
+
+                    <div class="card-meta">
+                        <span>{{ cuento.personaje_principal }}</span>
+                        <span>{{ cuento.fecha_creacion|date:"d/m/Y" }}</span>
+                    </div>
+
+                    <div class="card-description">
+                        {{ cuento.contenido|truncatewords:15 }}
+                    </div>
+
+                    <div class="card-buttons">
+                        <!-- REMOVIDO onclick - Ahora manejado por event listeners -->
+                        <a href="{% url 'stories:generated_story' cuento.id %}" class="card-btn btn-primary" data-cuento-id="{{ cuento.id }}">
+                            <i class="fas fa-book-open"></i> LEER
+                        </a>
+                        <!-- REMOVIDO onclick - Ahora manejado por event listeners -->
+                        <button class="card-btn btn-secondary play-story"
+                                data-cuento-id="{{ cuento.id }}"
+                                data-cuento-titulo="{{ cuento.titulo }}">
+                            <i class="fas fa-play"></i> ESCUCHAR
+                        </button>
+                        <!-- CORREGIDO: Usar la URL de stories para descarga -->
+                        <a href="{% url 'stories:descargar_pdf' cuento.id %}" class="card-btn btn-outline" target="_blank">
+                            <i class="fas fa-download"></i> DESCARGAR
+                        </a>
+                        <!-- REMOVIDO onclick - Ahora manejado por event listeners -->
+                        <button class="card-btn btn-danger delete-story"
+                                data-cuento-id="{{ cuento.id }}"
+                                data-cuento-titulo="{{ cuento.titulo }}">
+                            <i class="fas fa-trash"></i> ELIMINAR
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <h3>No se encontraron cuentos</h3>
+            <p>{% if filtros_actuales.perfil_id or filtros_actuales.tema or filtros_actuales.titulo %}
+                Intenta ajustar los filtros o
+                {% endif %}
+                <a href="{% url 'stories:generar' %}">crea tu primer cuento</a>
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- MODAL DE CONFIRMACIÓN -->
+<div id="deleteModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Confirmar Eliminación</h3>
+            <!-- REMOVIDO onclick - Ahora manejado por event listeners -->
+            <button class="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="warning-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <p class="main-text">¿Estás seguro de que quieres eliminar el cuento <strong id="cuentoTituloModal"></strong>?</p>
+            <p class="warning-text">Esta acción no se puede deshacer.</p>
+        </div>
+        <div class="modal-footer">
+            <!-- REMOVIDO onclick - Ahora manejado por event listeners -->
+            <button class="btn btn-secondary modal-cancel">Cancelar</button>
+            <button class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+        </div>
+    </div>
+</div>
+
+<!-- SOLO DATOS NECESARIOS PARA JAVASCRIPT -->
+<script>
+    // Datos mínimos necesarios para el JavaScript
+    window.bibliotecaData = {
+        titulos_disponibles: {{ titulos_disponibles|safe }},
+        csrfToken: '{{ csrf_token }}'
+    };
+</script>
+
+<script>
+  // Script inline para garantizar que los botones del modal funcionen
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log("🔍 Configurando event listeners del modal directamente en el HTML");
+
+    // Configurar botón cancelar
+    document.addEventListener('click', function(e) {
+      if (e.target && (e.target.classList.contains('modal-cancel') ||
+          (e.target.parentElement && e.target.parentElement.classList.contains('modal-cancel')))) {
+        console.log("🚫 Botón cancelar clickeado");
+        const modal = document.getElementById('deleteModal');
+        if (modal) {
+          modal.style.display = 'none';
+        }
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+
+    // Configurar botón X para cerrar
+    document.addEventListener('click', function(e) {
+      if (e.target && (e.target.classList.contains('modal-close') ||
+          (e.target.parentElement && e.target.parentElement.classList.contains('modal-close')))) {
+        console.log("❌ Botón cerrar (X) clickeado");
+        const modal = document.getElementById('deleteModal');
+        if (modal) {
+          modal.style.display = 'none';
+        }
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+
+    // Cerrar modal al hacer click fuera
+    window.addEventListener('click', function(e) {
+      const modal = document.getElementById('deleteModal');
+      if (e.target === modal) {
+        console.log("🌫️ Click fuera del modal");
+        modal.style.display = 'none';
+      }
+    });
+
+    // Cerrar modal con tecla Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        console.log("⌨️ Tecla Escape presionada");
+        const modal = document.getElementById('deleteModal');
+        if (modal && modal.style.display === 'flex') {
+          modal.style.display = 'none';
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<!-- SOLO CARGAR NUESTRO JAVASCRIPT EXTERNO -->
+<script src="{% static 'js/library.js' %}?v=5"></script>
+{% endblock %}

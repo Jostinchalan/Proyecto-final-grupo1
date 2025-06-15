@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Iniciar sesión - CuentIA</title>
+    <link rel="stylesheet" href="{% static 'css/styles_landing.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-image">
+            <img src="{% static 'images/login.jpg' %}" alt="Ilustración" />
+        </div>
+        <div class="auth-content">
+            <div class="auth-logo">
+                <img src="{% static 'images/robot4.PNG' %}" alt="CuentIA Logo" />
+                <h1>CuentIA</h1>
+            </div>
+            <div class="auth-form-container">
+                <h2 class="auth-title">Iniciar sesión</h2>
+                <p class="auth-subtitle">Inicia sesión para continuar con tu cuenta</p>
+
+                <form method="post" class="auth-form" novalidate>
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">Usuario</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.username.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.password.id_for_label }}" class="form-label">Contraseña</label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.password.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <ul class="errorlist nonfield">
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    <button type="submit" class="auth-button">Iniciar sesión</button>
+                </form>
+
+                <div class="auth-divider">o</div>
+
+                <div class="auth-footer">
+                    <p>¿No recuerdas tu contraseña? <a href="{% url 'user:password_reset' %}" class="auth-link">Recuperar contraseña</a></p>
+
+                    <p>¿Necesitas una cuenta? <a href="{% url 'user:register' %}" class="auth-link">Crear una</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

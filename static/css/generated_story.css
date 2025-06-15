@@ -1,0 +1,483 @@
+/* ===================================
+   GENERATED STORY STYLES - MODERN CARD DESIGN CON MODO OSCURO
+   =================================== */
+
+/* Asegurar que las variables se apliquen correctamente */
+:root {
+  --story-bg-light: #f1f5f9;
+  --story-card-light: #ffffff;
+  --story-text-light: #374151;
+}
+
+html.dark-mode {
+  --story-bg-light: var(--bg-primary);
+  --story-card-light: var(--card-bg);
+  --story-text-light: var(--text-primary);
+}
+
+.story-container {
+  min-height: calc(100vh - 200px);
+  padding: 2rem;
+  background: var(--bg-primary, #f1f5f9) !important;
+  position: relative;
+  color: var(--text-primary, #374151) !important;
+}
+
+/* Fondo con patrón sutil */
+.story-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(circle at 25% 25%, rgba(124, 58, 237, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Tarjeta principal del cuento */
+.story-card {
+  background: var(--card-bg, #ffffff) !important;
+  border-radius: 24px;
+  box-shadow: var(--shadow, 0 20px 25px -5px rgba(0, 0, 0, 0.1)) !important;
+  max-width: 900px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--border-color, rgba(124, 58, 237, 0.1)) !important;
+  position: relative;
+  z-index: 2;
+}
+
+/* Header del cuento mejorado */
+.story-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  padding: 3rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.story-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="stars" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.2)"/></pattern></defs><rect width="100" height="100" fill="url(%23stars)"/></svg>');
+  opacity: 0.3;
+}
+
+.story-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.02em;
+  color: white !important;
+}
+
+.story-meta-container {
+  position: relative;
+  z-index: 2;
+}
+
+.story-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: 1rem;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.15) !important;
+  padding: 0.75rem 1.25rem;
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white !important;
+}
+
+.meta-icon {
+  width: 24px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+/* Sección de imagen mejorada */
+.story-image-section {
+  padding: 3rem;
+  background: var(--card-bg, #fafbfc) !important;
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid var(--border-color, #e2e8f0) !important;
+}
+
+.story-image {
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(124, 58, 237, 0.1);
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.story-image:hover {
+  transform: scale(1.02);
+}
+
+.story-image-placeholder {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border-radius: 20px;
+  padding: 4rem;
+  text-align: center;
+  color: white !important;
+  position: relative;
+  overflow: hidden;
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.placeholder-book {
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  animation: bookFloat 3s ease-in-out infinite;
+}
+
+.placeholder-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: white !important;
+}
+
+.placeholder-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  color: white !important;
+}
+
+/* Contenido del cuento */
+.story-content-section {
+  padding: 3rem;
+  background: var(--card-bg, #ffffff) !important;
+}
+
+.story-text {
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: var(--text-primary, #374151) !important;
+  text-align: justify;
+  margin-bottom: 2.5rem;
+  font-family: "Georgia", serif;
+}
+
+.story-text p {
+  margin-bottom: 1.5rem;
+  color: var(--text-primary, #374151) !important;
+}
+
+/* Moraleja mejorada */
+.story-moraleja {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+  border: 2px solid #10b981 !important;
+  border-radius: 20px;
+  padding: 2.5rem;
+  text-align: center;
+  margin-top: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Modo oscuro para moraleja */
+html.dark-mode .story-moraleja {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%) !important;
+  border-color: #10b981 !important;
+}
+
+.story-moraleja::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+  animation: moralejaGlow 4s ease-in-out infinite;
+}
+
+.moraleja-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.moraleja-icon {
+  width: 40px;
+  height: 40px;
+  background: #10b981 !important;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white !important;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.moraleja-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #059669 !important;
+  margin: 0;
+}
+
+.moraleja-content {
+  font-size: 1.1rem;
+  color: #047857 !important;
+  font-style: italic;
+  line-height: 1.7;
+  position: relative;
+  z-index: 2;
+  font-weight: 500;
+}
+
+/* Modo oscuro para texto de moraleja */
+html.dark-mode .moraleja-title {
+  color: #10b981 !important;
+}
+
+html.dark-mode .moraleja-content {
+  color: #34d399 !important;
+}
+
+/* Sección de acciones mejorada */
+.story-actions {
+  background: var(--hover-bg, #f8fafc) !important;
+  padding: 3rem;
+  border-top: 1px solid var(--border-color, #e2e8f0) !important;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.action-form {
+  display: contents;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.25rem 2rem;
+  border: none;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  text-align: center;
+  font-family: inherit;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.action-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.action-btn:hover::before {
+  left: 100%;
+}
+
+.btn-icon {
+  width: 24px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.btn-audio {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+  color: white !important;
+}
+
+.btn-audio:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
+  color: white !important;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(107, 114, 128, 0.4);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%) !important;
+  color: white !important;
+}
+
+.btn-success:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(124, 58, 237, 0.4);
+}
+
+.btn-library {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: white !important;
+}
+
+.btn-library:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  color: white !important;
+}
+
+.btn-danger:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(239, 68, 68, 0.4);
+}
+
+/* Forzar aplicación en modo oscuro */
+html.dark-mode .story-container {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark-mode .story-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark-mode .story-image-section {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark-mode .story-content-section {
+  background: var(--card-bg) !important;
+}
+
+html.dark-mode .story-text,
+html.dark-mode .story-text p {
+  color: var(--text-primary) !important;
+}
+
+html.dark-mode .story-actions {
+  background: var(--hover-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Animaciones */
+@keyframes bookFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes moralejaGlow {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .story-container {
+    padding: 1rem;
+  }
+
+  .story-card {
+    border-radius: 16px;
+  }
+
+  .story-title {
+    font-size: 2rem;
+  }
+
+  .story-header {
+    padding: 2rem 1.5rem;
+  }
+
+  .story-content-section,
+  .story-image-section,
+  .story-actions {
+    padding: 2rem;
+  }
+
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .story-meta {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+

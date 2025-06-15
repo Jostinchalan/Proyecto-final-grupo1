@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configuraciones - CuentIA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div class="settings-header">
+        <h1>CONFIGURACIONES</h1>
+    </div>
+
+    <div class="settings-content">
+        <div class="settings-section">
+            <h2>Información personal</h2>
+
+            <div class="profile-section">
+                <div class="profile-avatar">
+                    {% if user.settings.avatar %}
+                        <img src="{{ user.settings.avatar.url }}" alt="Avatar" id="avatar-preview">
+                    {% else %}
+                        <div class="default-avatar" id="default-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+                    <div class="avatar-overlay">
+                        <label for="avatar-input" class="avatar-button">
+                            <i class="fas fa-camera"></i>
+                            AÑADIR FOTO
+                        </label>
+                        <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+
+                <!-- Botón de guardar foto (inicialmente oculto) -->
+                <div class="avatar-save-section" id="avatar-save-section" style="display: none;">
+                    <button type="button" id="save-avatar-btn" class="save-avatar-button">
+                        <i class="fas fa-save"></i>
+                        Guardar foto
+                    </button>
+                    <button type="button" id="cancel-avatar-btn" class="cancel-avatar-button">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </button>
+                </div>
+
+                <!-- FORMULARIO PRINCIPAL ACTUALIZADO -->
+                <form id="profile-form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <!-- Campo oculto para identificar el tipo de formulario -->
+                    <input type="hidden" name="form_type" value="profile">
+
+                    <div class="form-group">
+                        <label for="username">Nombre de usuario</label>
+                        <input type="text"
+                               id="username"
+                               name="username"
+                               value="{{ user.username }}"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Correo electrónico</label>
+                        <input type="email"
+                               id="email"
+                               name="email"
+                               value="{{ user.email }}"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <button type="submit" class="save-button">Guardar cambios</button>
+                </form>
+            </div>
+
+            <div class="password-section">
+                <h3>Cambiar contraseña</h3>
+                <form id="password-form" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="password">
+
+                    <div class="form-group">
+                        <label for="old_password">Contraseña actual</label>
+                        {{ password_form.old_password }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="new_password1">Nueva contraseña</label>
+                        {{ password_form.new_password1 }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="new_password2">Confirmar nueva contraseña</label>
+                        {{ password_form.new_password2 }}
+                    </div>
+
+                    <button type="submit" class="save-button">Guardar cambios</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="preferences-section">
+            <h2>Preferencias</h2>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <h3>Recibir notificaciones por email</h3>
+                    <p>Recibe notificaciones sobre su ingreso a CuentIA</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="email-notifications" {% if user.settings.email_notifications %}checked{% endif %}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <h3>Modo Oscuro</h3>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="dark-mode" {% if user.settings.dark_mode %}checked{% endif %}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <h3>Idioma</h3>
+                </div>
+                <select id="language-select" class="language-dropdown">
+                    <option value="es" {% if user.settings.language == 'es' %}selected{% endif %}>🇪🇸 Español</option>
+                    <option value="en" {% if user.settings.language == 'en' %}selected{% endif %}>🇺🇸 Inglés</option>
+                    <option value="de" {% if user.settings.language == 'de' %}selected{% endif %}>🇩🇪 Alemán</option>
+                    <option value="fr" {% if user.settings.language == 'fr' %}selected{% endif %}>🇫🇷 Francés</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/settings.js' %}"></script>
+{% endblock %}

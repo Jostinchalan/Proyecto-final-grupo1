@@ -1,0 +1,351 @@
+/* Estilos específicos para la página de configuraciones */
+.settings-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: "Inter", sans-serif;
+}
+
+.settings-header {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+  color: white;
+  text-align: center;
+  padding: 30px;
+  border-radius: 20px 20px 0 0;
+  margin-bottom: 0;
+}
+
+.settings-header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.settings-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  background: var(--settings-content-bg);
+  background-color: #1e1e1e !important;
+  padding: 40px;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+html.dark-mode .settings-content {
+  background-color: #1e1e1e !important;
+}
+.settings-section h2,
+.preferences-section h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 30px;
+}
+
+.profile-section {
+  margin-bottom: 40px;
+}
+
+.profile-avatar {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 30px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #8b5cf6;
+  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+}
+
+.profile-avatar img,
+.default-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2rem;
+}
+
+.avatar-overlay {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.avatar-button {
+  background: #8b5cf6;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.3s ease;
+}
+
+.avatar-button:hover {
+  background: #7c3aed;
+  transform: translateY(-2px);
+}
+
+/* NUEVOS ESTILOS PARA BOTONES DE GUARDAR FOTO */
+.avatar-save-section {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.save-avatar-button {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.save-avatar-button:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.cancel-avatar-button {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+.cancel-avatar-button:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.save-button {
+  width: 100%;
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.save-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+}
+
+.password-section {
+  border-top: 2px solid var(--border-color);
+  padding-top: 30px;
+}
+
+.password-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.preference-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.preference-info h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 5px 0;
+}
+
+.preference-info p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #8b5cf6;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.language-dropdown {
+  padding: 10px 15px;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 1rem;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  cursor: pointer;
+  min-width: 150px;
+}
+
+.language-dropdown:focus {
+  outline: none;
+  border-color: #8b5cf6;
+}
+
+/* NUEVOS ESTILOS PARA MENSAJES DE VALIDACIÓN */
+.validation-message {
+  font-size: 0.875rem;
+  margin-top: 5px;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
+}
+
+.validation-message.error {
+  color: #ef4444;
+}
+
+.validation-message.success {
+  color: #10b981;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .settings-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .settings-header h1 {
+    font-size: 2rem;
+  }
+
+  .avatar-save-section {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .save-avatar-button,
+  .cancel-avatar-button {
+    width: 100%;
+    max-width: 200px;
+  }
+}

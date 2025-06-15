@@ -1,0 +1,23 @@
+🔐 {{ site_name }} - Nuevo inicio de sesión detectado
+
+¡Hola {{ user.username }}!
+
+Hemos detectado un nuevo inicio de sesión en tu cuenta. Si fuiste tú, puedes ignorar este mensaje.
+
+DETALLES DEL INICIO DE SESIÓN:
+================================
+Fecha y hora: {{ timestamp|date:"d/m/Y H:i:s" }}
+Dirección IP: {{ ip_address }}
+Dispositivo: {{ device_info.device }}
+Navegador: {{ device_info.browser }}
+Sistema operativo: {{ device_info.os }}
+Ubicación aproximada: {{ hostname }}
+
+🛡️ NOTA DE SEGURIDAD:
+Si no reconoces este inicio de sesión, te recomendamos cambiar tu contraseña inmediatamente y revisar la actividad de tu cuenta.
+
+Revisar configuración de seguridad: {{ site_url }}/user/settings/
+
+---
+Este es un mensaje automático de seguridad de {{ site_name }}.
+Si no deseas recibir estas notificaciones, puedes desactivarlas en tu configuración.

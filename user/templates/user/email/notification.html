@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo inicio de sesión - {{ site_name }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8fafc;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #8b5cf6;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #8b5cf6;
+            margin-bottom: 10px;
+        }
+        .alert-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .info-item {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #8b5cf6;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #374151;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .info-value {
+            color: #1f2937;
+            margin-top: 5px;
+        }
+        .security-note {
+            background: #ecfdf5;
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        @media (max-width: 600px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🔐 {{ site_name }}</div>
+            <h1>Nuevo inicio de sesión detectado</h1>
+        </div>
+
+        <div class="alert-box">
+            <strong>¡Hola {{ user.username }}!</strong><br>
+            Hemos detectado un nuevo inicio de sesión en tu cuenta. Si fuiste tú, puedes ignorar este mensaje.
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Fecha y hora</div>
+                <div class="info-value">{{ timestamp|date:"d/m/Y H:i" }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Dirección IP</div>
+                <div class="info-value">{{ ip_address }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Dispositivo</div>
+                <div class="info-value">{{ device_info.device }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Navegador</div>
+                <div class="info-value">{{ device_info.browser }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Sistema operativo</div>
+                <div class="info-value">{{ device_info.os }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Ubicación aproximada</div>
+                <div class="info-value">{{ hostname }}</div>
+            </div>
+        </div>
+
+        <div class="security-note">
+            <strong>🛡️ Nota de seguridad:</strong><br>
+            Si no reconoces este inicio de sesión, te recomendamos cambiar tu contraseña inmediatamente y revisar la actividad de tu cuenta.
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ site_url }}/user/configuration/"
+               style="background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
+                Revisar configuración de seguridad
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>Este es un mensaje automático de seguridad de {{ site_name }}.</p>
+            <p>Si no deseas recibir estas notificaciones, puedes desactivarlas en tu configuración.</p>
+        </div>
+    </div>
+</body>
+</html>

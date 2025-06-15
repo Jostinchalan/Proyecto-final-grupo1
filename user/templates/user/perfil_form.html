@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block dashboard_content %}
+<div class="flex justify-between items-center mb-6">
+  <h1 class="text-2xl font-bold text-slate-800">{% if perfil %}Editar Perfil{% else %}Crear Nuevo Perfil{% endif %}</h1>
+  <a href="{% url 'usuarios:perfil_list' %}" class="btn btn-outline">
+    <i class="fas fa-arrow-left mr-2"></i>
+    Volver a Perfiles
+  </a>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Información del Perfil</h2>
+  </div>
+  <div class="card-content">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="form-group">
+          <label class="form-label" for="name">Nombre del Niño/a</label>
+          <input type="text" class="form-input" id="name" name="name" value="{{ perfil.name|default:'' }}" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="age">Edad</label>
+          <input type="number" class="form-input" id="age" name="age" min="1" max="12" value="{{ perfil.age|default:'' }}" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="gender">Género</label>
+          <select class="form-select" id="gender" name="gender" required>
+            <option value="" disabled {% if not perfil %}selected{% endif %}>Selecciona género</option>
+            <option value="M" {% if perfil.gender == 'M' %}selected{% endif %}>Masculino</option>
+            <option value="F" {% if perfil.gender == 'F' %}selected{% endif %}>Femenino</option>
+            <option value="O" {% if perfil.gender == 'O' %}selected{% endif %}>Otro</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="avatar">Foto de Perfil (opcional)</label>
+          <input type="file" class="form-input" id="avatar" name="avatar" accept="image/*">
+        </div>
+      </div>
+
+      <div class="form-group mt-4">
+        <label class="form-label" for="interests">Intereses (separados por comas)</label>
+        <input type

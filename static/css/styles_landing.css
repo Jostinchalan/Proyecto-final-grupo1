@@ -1,0 +1,486 @@
+/*Styles_landing.css es de base.html*/
+/* ===== VARIABLES CSS ===== */
+:root {
+    --primary: #7e22ce;
+    --primary-light: #a855f7;
+    --primary-dark: #6b21a8;
+    --secondary: #e9d5ff;
+    --secondary-light: #f3e8ff;
+    --secondary-dark: #d8b4fe;
+    --text-dark: #1e293b;
+    --text-light: #64748b;
+    --white: #ffffff;
+    --background: #f8fafc;
+    --background-light: #f1f5f9;
+    --background-purple: #f5f3ff;
+    --error: #ef4444;
+    --success: #22c55e;
+}
+
+/* ===== RESET GLOBAL ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text-dark);
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button, .button {
+    cursor: pointer;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+input, select, textarea {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    font-size: 0.875rem;
+    outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(126, 34, 206, 0.1);
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* ===== LANDING PAGE ESPECÍFICO ===== */
+
+/* ✅ SCROLL HABILITADO */
+body:has(.landing-container) {
+    background: none;
+    overflow-x: hidden;
+    overflow-y: auto; /* Permite scroll vertical */
+}
+
+.landing-container {
+    min-height: 100vh; /* ✅ min-height para permitir crecimiento */
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+    overflow-x: hidden;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+/* Estrellas decorativas */
+.landing-stars {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.star {
+    position: absolute;
+    color: #a855f7;
+    opacity: 0.4;
+    animation: twinkle 3s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.2; transform: scale(1) rotate(0deg); }
+    100% { opacity: 0.6; transform: scale(1.1) rotate(180deg); }
+}
+
+/* ✅ HEADER COMPACTO */
+.landing-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 1.5rem 3rem; /* ✅ REDUCIDO: de 2rem a 1.5rem */
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.landing-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.landing-logo img {
+    height: 40px; /* ✅ REDUCIDO: de 48px a 40px */
+    width: 40px;
+}
+
+.landing-logo h1 {
+    font-size: 1.75rem; /* ✅ REDUCIDO: de 2rem a 1.75rem */
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+/* ✅ LAYOUT PRINCIPAL OPTIMIZADO */
+.landing-main {
+    display: grid;
+    grid-template-columns: 50% 50%; /* ✅ AJUSTADO: 50/50 para dar más espacio al robot */
+    flex: 1;
+    padding: 0 3rem 2rem 3rem; /* ✅ REDUCIDO: padding inferior */
+    gap: 2rem; /* ✅ REDUCIDO: de 3rem a 2rem para más espacio */
+    align-items: start; /* ✅ CAMBIADO: de center a start */
+    position: relative;
+    z-index: 10;
+    min-height: 0;
+}
+
+/* ✅ CONTENIDO IZQUIERDO COMPACTO */
+.landing-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* ✅ CAMBIADO: de center a flex-start */
+    max-width: none;
+    padding: 0;
+    padding-right: 0.5rem; /* ✅ REDUCIDO: para dar más espacio al robot */
+}
+
+/* ✅ TÍTULO PRINCIPAL COMPACTO */
+.landing-title {
+    font-size: 2.75rem; /* ✅ REDUCIDO: de 3.5rem a 2.75rem */
+    font-weight: 800;
+    color: #2d3748;
+    line-height: 1.1;
+    margin-bottom: 1.25rem; /* ✅ REDUCIDO: de 2rem a 1.25rem */
+    letter-spacing: -0.02em;
+    text-align: center;
+}
+
+/* ✅ DESCRIPCIÓN COMPACTA */
+.landing-description {
+    font-size: 0.95rem; /* ✅ REDUCIDO: de 1rem a 0.95rem */
+    color: #4a5568;
+    margin-bottom: 1.75rem; /* ✅ REDUCIDO: de 2.5rem a 1.75rem */
+    line-height: 1.5; /* ✅ REDUCIDO: de 1.6 a 1.5 */
+    text-align: center;
+    max-width: 100%;
+}
+
+/* ✅ BOTONES COMPACTOS */
+.landing-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem; /* ✅ REDUCIDO: de 3rem a 2rem */
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.landing-button-primary {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    padding: 0.75rem 1.75rem; /* ✅ REDUCIDO: padding */
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.95rem; /* ✅ REDUCIDO: de 1rem a 0.95rem */
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+    min-width: 130px; /* ✅ REDUCIDO: de 140px a 130px */
+    text-align: center;
+}
+
+.landing-button-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    color: white;
+}
+
+.landing-button-secondary {
+    background-color: white;
+    color: #8b5cf6;
+    padding: 0.75rem 1.75rem; /* ✅ REDUCIDO: padding */
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.95rem; /* ✅ REDUCIDO: de 1rem a 0.95rem */
+    border: 2px solid #8b5cf6;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    display: inline-block;
+    min-width: 130px; /* ✅ REDUCIDO: de 140px a 130px */
+    text-align: center;
+}
+
+.landing-button-secondary:hover {
+    background-color: #f3e8ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+    color: #8b5cf6;
+}
+
+/* ✅ TÍTULO DE CARACTERÍSTICAS COMPACTO */
+.landing-features-title {
+    font-size: 1.5rem; /* ✅ REDUCIDO: de 1.75rem a 1.5rem */
+    font-weight: 700;
+    color: #8b5cf6;
+    margin-bottom: 1.5rem; /* ✅ REDUCIDO: de 2rem a 1.5rem */
+    text-align: center;
+}
+
+/* ✅ GRID DE CARACTERÍSTICAS COMPACTO */
+.landing-features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem; /* ✅ REDUCIDO: de 1.5rem a 1rem */
+    width: 100%;
+}
+
+.landing-feature-card {
+    background-color: white;
+    border-radius: 0.75rem; /* ✅ REDUCIDO: de 1rem a 0.75rem */
+    padding: 1rem; /* ✅ REDUCIDO: de 1.5rem a 1rem */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+    height: fit-content;
+}
+
+.landing-feature-card:hover {
+    transform: translateY(-3px); /* ✅ REDUCIDO: de -5px a -3px */
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+}
+
+/* ✅ ÍCONOS COMPACTOS */
+.landing-feature-icon {
+    width: 40px; /* ✅ REDUCIDO: de 48px a 40px */
+    height: 40px;
+    margin: 0 auto 0.75rem; /* ✅ REDUCIDO: de 1rem a 0.75rem */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.landing-feature-icon svg {
+    width: 40px; /* ✅ REDUCIDO: de 48px a 40px */
+    height: 40px;
+}
+
+/* ✅ TÍTULOS DE CARACTERÍSTICAS COMPACTOS */
+.landing-feature-title {
+    font-weight: 700;
+    font-size: 1rem; /* ✅ REDUCIDO: de 1.125rem a 1rem */
+    margin-bottom: 0.5rem; /* ✅ REDUCIDO: de 0.75rem a 0.5rem */
+    color: #2d3748;
+}
+
+/* ✅ DESCRIPCIÓN DE CARACTERÍSTICAS COMPACTA */
+.landing-feature-description {
+    font-size: 0.8rem; /* ✅ REDUCIDO: de 0.875rem a 0.8rem */
+    color: #4a5568;
+    line-height: 1.4; /* ✅ REDUCIDO: de 1.5 a 1.4 */
+    margin: 0;
+}
+
+/* ✅ IMAGEN DERECHA - ROBOT MÁS GRANDE */
+.landing-image {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* ✅ CAMBIADO: de center a flex-start */
+    position: relative;
+    height: 100%;
+    padding-top: 0.5rem; /* ✅ REDUCIDO: padding superior */
+}
+
+.landing-image img {
+    width: 100%; /* ✅ AUMENTADO: de 85% a 100% */
+    height: auto;
+    max-height: 70vh; /* ✅ AUMENTADO: de 50vh a 70vh */
+    object-fit: contain;
+    filter: drop-shadow(0 10px 30px rgba(139, 92, 246, 0.2));
+    animation: float 6s ease-in-out infinite;
+    z-index: 2;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); } /* ✅ RESTAURADO: de -15px a -20px */
+}
+
+/* Fondo decorativo */
+.landing-image::before {
+    content: '';
+    position: absolute;
+    width: 350px; /* ✅ AUMENTADO: de 250px a 350px */
+    height: 350px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.landing-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Animaciones de entrada */
+.landing-content > * {
+    animation: fadeInUp 0.8s ease-out forwards;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.landing-content > *:nth-child(1) { animation-delay: 0.1s; }
+.landing-content > *:nth-child(2) { animation-delay: 0.2s; }
+.landing-content > *:nth-child(3) { animation-delay: 0.3s; }
+.landing-content > *:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ✅ RESPONSIVE OPTIMIZADO CON ROBOT MÁS GRANDE */
+@media (max-width: 1200px) {
+    .landing-main {
+        grid-template-columns: 55% 45%;
+        padding: 0 2rem 2rem 2rem;
+        gap: 2rem;
+    }
+
+    .landing-title {
+        font-size: 2.5rem;
+    }
+
+    .landing-image img {
+        width: 95%; /* ✅ AUMENTADO */
+        max-height: 60vh; /* ✅ AUMENTADO */
+    }
+}
+
+@media (max-width: 768px) {
+    .landing-header {
+        padding: 1rem 2rem;
+    }
+
+    .landing-logo h1 {
+        font-size: 1.5rem;
+    }
+
+    .landing-main {
+        grid-template-columns: 1fr;
+        padding: 0 2rem 2rem 2rem;
+        gap: 1.5rem;
+        text-align: center;
+    }
+
+    .landing-content {
+        order: 2;
+        padding-right: 0;
+        text-align: center;
+    }
+
+    .landing-image {
+        order: 1;
+        height: auto;
+        min-height: 30vh; /* ✅ AUMENTADO */
+        padding-top: 0;
+    }
+
+    .landing-title {
+        font-size: 2rem;
+        text-align: center;
+    }
+
+    .landing-description {
+        text-align: center;
+    }
+
+    .landing-buttons {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .landing-features-title {
+        text-align: center;
+    }
+
+    .landing-features-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .landing-image img {
+        width: 80%; /* ✅ AUMENTADO */
+        max-height: 40vh; /* ✅ AUMENTADO */
+    }
+}
+
+@media (max-width: 480px) {
+    .landing-header {
+        padding: 1rem;
+    }
+
+    .landing-main {
+        padding: 0 1rem 1rem 1rem;
+    }
+
+    .landing-title {
+        font-size: 1.75rem;
+    }
+
+    .landing-buttons {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .landing-button-primary,
+    .landing-button-secondary {
+        padding: 0.75rem 1.5rem;
+        width: 100%;
+        text-align: center;
+        min-width: auto;
+    }
+
+    .landing-features-title {
+        font-size: 1.25rem;
+    }
+
+    .landing-feature-card {
+        padding: 1rem;
+    }
+
+    .landing-image img {
+        width: 85%; /* ✅ AUMENTADO */
+        max-height: 35vh; /* ✅ AUMENTADO */
+    }
+}

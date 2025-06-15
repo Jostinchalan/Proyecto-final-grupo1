@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Welcome banner -->
+<div class="welcome-banner">
+    <h1>BIENVENIDO/A A CUENTIA</h1>
+    <p>DEJA CORRER TU IMAGINACIÓN Y CREA LOS MEJORES CUENTOS</p>
+</div>
+
+<!-- Actividad reciente -->
+<div class="section">
+    <div class="section-header">
+        <h2>ACTIVIDAD RECIENTE</h2>
+        <div class="controls">
+            <a href="{% url 'library:library' %}" style="background: #8B5CF6; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; font-size: 0.875rem;">Ver Todos</a>
+        </div>
+    </div>
+
+    <div class="story-cards">
+        {% if cuentos_recientes %}
+            {% for cuento in cuentos_recientes %}
+            <!-- Tarjeta de cuento real -->
+            <div class="story-card">
+                <div class="story-image">
+                    {% if cuento.imagen_url and not cuento.imagen_url|slice:":7" == "/static" %}
+                        <img src="{{ cuento.imagen_url }}" alt="{{ cuento.titulo }}">
+                    {% else %}
+                        <img src="{% static 'images/robot4.png' %}" alt="{{ cuento.titulo }}">
+                    {% endif %}
+                    <div class="tags">
+                        <span>{{ cuento.perfil.edad|default:"TODAS" }} AÑOS</span>
+                        <span>{{ cuento.get_tema_display|upper|default:cuento.tema|upper }}</span>
+                        {% if cuento.estado == 'completado' %}
+                            <span style="background: #10B981;">✅ LISTO</span>
+                        {% elif cuento.estado == 'generando' %}
+                            <span style="background: #F59E0B;">⏳ GENERANDO</span>
+                        {% else %}
+                            <span style="background: #EF4444;">❌ ERROR</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="story-info">
+                    <h3>{{ cuento.titulo|upper|truncatechars:25 }}</h3>
+                    <p>CUENTO CREADO PARA {{ cuento.personaje_principal|upper|default:"NIÑO" }}</p>
+                    <div class="author">
+                        <span>{{ cuento.fecha_creacion|date:"d/m/Y" }}</span>
+                        {% if cuento.perfil %}
+                            <span>• {{ cuento.perfil.nombre|upper }}</span>
+                        {% endif %}
+                    </div>
+                    {% if cuento.estado == 'completado' %}
+                        <a href="{% url 'stories:generated_story' cuento.id %}" style="background: #8B5CF6; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; font-size: 0.875rem; margin-top: 1rem; display: inline-block;">Leer Cuento</a>
+                    {% elif cuento.estado == 'generando' %}
+                        <a href="{% url 'stories:generando' %}" style="background: #F59E0B; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; font-size: 0.875rem; margin-top: 1rem; display: inline-block;">Ver Progreso</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <!-- Tarjetas de acción cuando no hay cuentos -->
+            <div class="story-card">
+                <div class="story-image">
+                    <img src="{% static 'images/robot4.png' %}" alt="Crear Cuento">
+                    <div class="tags">
+                        <span>✨ NUEVO</span>
+                    </div>
+                </div>
+                <div class="story-info">
+                    <h3>CREAR TU PRIMER CUENTO</h3>
+                    <p>GENERA UN CUENTO MÁGICO CON IA</p>
+                    <div class="author">
+                        <span>CUENTIA</span>
+                    </div>
+                    <a href="{% url 'stories:generar' %}" style="background: #8B5CF6; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; font-size: 0.875rem; margin-top: 1rem; display: inline-block;">Crear Cuento</a>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-image">
+                    <img src="{% static 'images/robot4.png' %}" alt="Crear Perfil">
+                    <div class="tags">
+                        <span>👤 PERFIL</span>
+                    </div>
+                </div>
+                <div class="story-info">
+                    <h3>CREAR PERFIL INFANTIL</h3>
+                    <p>PERSONALIZA LA EXPERIENCIA</p>
+                    <div class="author">
+                        <span>CUENTIA</span>
+                    </div>
+                    <a href="{% url 'user:create_perfil' %}" style="background: #8B5CF6; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; font-size: 0.875rem; margin-top: 1rem; display: inline-block;">Crear Perfil</a>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-image">
+                    <img src="{% static 'images/robot4.png' %}" alt="Biblioteca">
+                    <div class="tags">
+                        <span>📚 BIBLIOTECA</span>
+                    </div>
+                </div>
+                <div class="story-info">
+                    <h3>EXPLORAR BIBLIOTECA</h3>
+                    <p>DESCUBRE CUENTOS GUARDADOS</p>
+                    <div class="author">
+                        <span>CUENTIA</span>
+                    </div>
+                    <a href="{% url 'library:library' %}" style="background: #8B5CF6; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; font-size: 0.875rem; margin-top: 1rem; display: inline-block;">Ver Biblioteca</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Cuentos populares -->
+<div class="section">
+    <div class="section-header">
+        <h2>CUENTOS POPULARES</h2>
+        <div class="controls">
+            <a href="{% url 'library:library' %}" style="background: #8B5CF6; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; font-size: 0.875rem;">Ver Biblioteca</a>
+        </div>
+    </div>
+
+    <div class="popular-stories">
+        {% if cuentos_populares %}
+            {% for cuento in cuentos_populares %}
+            <!-- Cuento popular real -->
+            <div class="popular-story-card">
+                <div class="popular-story-icon">
+                    {% if cuento.es_favorito %}
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z"/>
+                        </svg>
+                    {% else %}
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 19.5V4.5C4 3.4 4.9 2.5 6 2.5H18C19.1 2.5 20 3.4 20 4.5V19.5L12 15.5L4 19.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    {% endif %}
+                </div>
+                <div class="popular-story-info">
+                    <h3>{{ cuento.titulo|upper|truncatechars:30 }}</h3>
+                    <p>{{ cuento.veces_leido|default:0 }} VECES LEÍDO{% if cuento.es_favorito %} • ⭐ FAVORITO{% endif %}</p>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <!-- Mensajes por defecto -->
+            <div class="popular-story-card">
+                <div class="popular-story-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="popular-story-info">
+                    <h3>CREA TU PRIMER CUENTO</h3>
+                    <p>PARA VER ESTADÍSTICAS</p>
+                </div>
+            </div>
+
+            <div class="popular-story-card">
+                <div class="popular-story-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 11H15M9 15H15M17 21L12 16L7 21V5C7 3.9 7.9 3 9 3H15C16.1 3 17 3.9 17 5V21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="popular-story-info">
+                    <h3>EXPLORA LA BIBLIOTECA</h3>
+                    <p>DESCUBRE CUENTOS</p>
+                </div>
+            </div>
+
+            <div class="popular-story-card">
+                <div class="popular-story-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 4H18C19.1 4 20 4.9 20 6V18C20 19.1 19.1 20 18 20H6C4.9 20 4 19.1 4 18V6C4 4.9 4.9 4 6 4H8M15 2V6H9V2H15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="popular-story-info">
+                    <h3>VE TU SEGUIMIENTO</h3>
+                    <p>ESTADÍSTICAS DETALLADAS</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Perfiles recientes (nueva sección) -->
+{% if perfiles_recientes %}
+<div class="section">
+    <div class="section-header">
+        <h2>PERFILES INFANTILES</h2>
+        <div class="controls">
+            <a href="{% url 'user:perfil_list' %}" style="background: #8B5CF6; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; font-size: 0.875rem;">Ver Todos</a>
+        </div>
+    </div>
+
+    <div class="popular-stories">
+        {% for perfil in perfiles_recientes|slice:":3" %}
+        <div class="popular-story-card">
+            <div class="popular-story-icon">
+                {% if perfil.foto_perfil %}
+                    <img src="{{ perfil.foto_perfil.url }}" alt="{{ perfil.nombre }}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">
+                {% else %}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 21V19C20 17.9 19.1 17 18 17H6C4.9 17 4 17.9 4 19V21M16 7C16 9.2 14.2 11 12 11S8 9.2 8 7S9.8 3 12 3S16 4.8 16 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                {% endif %}
+            </div>
+            <div class="popular-story-info">
+                <h3>{{ perfil.nombre|upper }}</h3>
+                <p>{{ perfil.edad }} AÑOS • {{ perfil.get_genero_display|upper }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Mensaje de bienvenida -->
+<div class="welcome-message">
+    <p>
+        Bienvenido a CuentIA, la innovadora plataforma que transforma tu imaginación en historias mágicas con ayuda de la inteligencia artificial. ¿Quieres crear cuentos únicos para tus hijos, alumnos o simplemente para disfrutar de momentos inolvidables? ¡Has llegado al lugar perfecto!
+    </p>
+</div>
+
+<style>
+/* Estilos adicionales para el dashboard */
+.story-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.popular-stories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .story-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .popular-stories {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mejorar la apariencia de las tarjetas */
+.story-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.story-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+}
+
+.popular-story-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.popular-story-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.1);
+}
+</style>
+    
+{% endblock %}

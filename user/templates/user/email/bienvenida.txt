@@ -1,0 +1,31 @@
+🤖✨ ¡BIENVENIDO A LA MAGIA DE {{ site_name|upper }}! ✨🤖
+
+¡Hola {{ user.username }}!
+
+¡Estamos absolutamente emocionados de que te hayas unido a nuestra comunidad mágica!
+
+Has dado el primer paso hacia un mundo donde la inteligencia artificial y la creatividad se combinan para crear cuentos únicos que inspirarán la imaginación de los más pequeños.
+
+🎨 PERSONALIZACIÓN MÁGICA
+Crea cuentos únicos adaptados a cada niño, con personajes y aventuras personalizadas
+
+🎵 AUDIO NARRACIÓN
+Escucha tus cuentos con voces naturales y envolventes powered by IA
+
+📚 BIBLIOTECA PERSONAL
+Guarda y organiza todos tus cuentos en tu biblioteca mágica personal
+
+🚀 ¿LISTO PARA CREAR TU PRIMER CUENTO MÁGICO?
+
+La aventura comienza visitando: {{ site_url }}
+
+💡 CONSEJO MÁGICO: Para obtener los mejores resultados, sé específico sobre los intereses del niño, su edad y el tipo de aventura que quieres crear. ¡Nuestra IA hará el resto!
+
+Si tienes alguna pregunta o necesitas ayuda, nuestro equipo está aquí para ti. Simplemente responde a este correo y te ayudaremos en tu viaje mágico.
+
+"Creando magia, una historia a la vez" ✨
+El equipo de {{ site_name }}
+
+---
+© 2025 {{ site_name }}. Todos los derechos reservados.
+Creando el futuro de los cuentos infantiles con IA.

@@ -1,0 +1,599 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/generated_story.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="story-container" data-story-id="{{ cuento.id }}" {% if cuento.perfil %}data-profile-id="{{ cuento.perfil.id }}"{% endif %}>
+    {% csrf_token %}
+    <div class="story-card">
+        <!-- Header del cuento -->
+        <div class="story-header">
+            <h1 class="story-title">{{ cuento.titulo|upper }}</h1>
+            <div class="story-meta-container">
+                <div class="story-meta">
+                    <div class="meta-item">
+                        <div class="meta-icon">👤</div>
+                        <span>Personaje: {{ cuento.personaje_principal }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon">🎭</div>
+                        <span>Tema: {{ cuento.get_tema_display }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon">📅</div>
+                        <span>{{ cuento.fecha_creacion|date:"d/m/Y" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Imagen del cuento -->
+        <div class="story-image-section">
+            {% if cuento.imagen_url %}
+                <img src="{{ cuento.imagen_url }}" alt="{{ cuento.titulo }}" class="story-image">
+            {% else %}
+                <div class="story-image-placeholder">
+                    <div class="placeholder-book">📖</div>
+                    <div class="placeholder-title">{{ cuento.titulo }}</div>
+                    <div class="placeholder-subtitle">Tu cuento personalizado está listo</div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Contenido del cuento -->
+        <div class="story-content-section">
+            <!-- Añadir contador de tiempo de lectura -->
+            <div class="reading-time-display">
+                <span class="reading-time-label">Tiempo de lectura: </span>
+                <span id="reading-time-display">00:00</span>
+            </div>
+
+            <div class="story-text" id="story-content">
+                {{ cuento.contenido|linebreaks }}
+            </div>
+
+            {% if cuento.moraleja %}
+            <div class="story-moraleja">
+                <div class="moraleja-header">
+                    <div class="moraleja-icon">✨</div>
+                    <h3 class="moraleja-title">Moraleja</h3>
+                    <div class="moraleja-icon">✨</div>
+                </div>
+                <div class="moraleja-content" id="moraleja-content">
+                    {{ cuento.moraleja }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="story-actions">
+            <div class="actions-grid">
+                <button class="action-btn btn-audio" id="audio-btn">
+                    <div class="btn-icon">🎧</div>
+                    <span>Escuchar Cuento</span>
+                </button>
+
+                <!-- CORREGIDO: Usar botón con JavaScript para forzar descarga -->
+                <button class="action-btn btn-secondary download-btn" id="download-btn" data-cuento-id="{{ cuento.id }}">
+                    <div class="btn-icon">📄</div>
+                    <span>Descargar Cuento</span>
+                </button>
+
+                <a href="{% url 'stories:generar' %}" class="action-btn btn-success">
+                    <div class="btn-icon">✨</div>
+                    <span>Crear Nuevo Cuento</span>
+                </a>
+
+                <!-- Botón para guardar en biblioteca con confirmación -->
+                <button class="action-btn btn-library" id="save-to-library-btn" data-cuento-id="{{ cuento.id }}">
+                    <div class="btn-icon">📚</div>
+                    <span>{% if cuento.en_biblioteca %}Ya en Biblioteca{% else %}Guardar en la Biblioteca{% endif %}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE CONFIRMACIÓN PARA GUARDAR EN BIBLIOTECA -->
+<div id="saveToLibraryModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Guardar en Biblioteca</h3>
+            <button class="modal-close" id="closeSaveModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="success-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <p class="main-text">¿Deseas guardar <strong id="cuentoTituloSaveModal">{{ cuento.titulo }}</strong> en tu biblioteca personal?</p>
+            <p class="info-text">Podrás acceder a él desde la sección de biblioteca cuando quieras.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancelSaveBtn">Cancelar</button>
+            <button class="btn btn-primary" id="confirmSaveBtn">Guardar en Biblioteca</button>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/generated_story.js' %}"></script>
+
+<!-- Script para seguimiento de tiempo de lectura y modal -->
+<script>
+// Seguimiento de tiempo de lectura - Mejorado
+document.addEventListener('DOMContentLoaded', function() {
+    const storyContainer = document.querySelector('.story-container');
+    const storyId = storyContainer ? storyContainer.dataset.storyId : null;
+    const profileId = storyContainer ? storyContainer.dataset.profileId : null;
+
+    console.log(`📚 Cargando cuento ID: ${storyId}, Perfil ID: ${profileId || 'No especificado'}`);
+
+    // NUEVA FUNCIONALIDAD: Configurar botón de descarga directamente
+    const downloadBtn = document.getElementById('download-btn');
+    if (downloadBtn) {
+        console.log("📄 Configurando botón de descarga directamente en HTML");
+
+        downloadBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const cuentoId = this.dataset.cuentoId || storyId;
+
+            if (!cuentoId) {
+                console.error("❌ No se pudo determinar el ID del cuento");
+                showMessage("❌ Error: No se pudo determinar el cuento a descargar", "error");
+                return;
+            }
+
+            console.log("📄 Iniciando descarga para cuento:", cuentoId);
+            showMessage("📄 Preparando descarga...", "info");
+
+            // Crear enlace temporal para forzar descarga
+            const tempLink = document.createElement("a");
+            tempLink.href = `/stories/cuento/${cuentoId}/descargar/`;
+            tempLink.download = ""; // Esto fuerza la descarga
+            tempLink.style.display = "none";
+            tempLink.target = "_blank"; // Abrir en nueva ventana como respaldo
+
+            // Agregar al DOM, hacer clic y remover
+            document.body.appendChild(tempLink);
+            tempLink.click();
+            document.body.removeChild(tempLink);
+
+            // Mensaje de éxito después de un momento
+            setTimeout(() => {
+                showMessage("✅ ¡Descarga iniciada!", "success");
+            }, 1000);
+        });
+
+        console.log("✅ Botón de descarga configurado directamente");
+    }
+
+    if (storyId) {
+        // Verificar si las funciones globales están disponibles
+        if (typeof window.startReadingTimer === 'function') {
+            console.log('✅ Usando funciones globales de seguimiento de lectura');
+
+            // Guardar el ID del perfil actual si está disponible
+            if (profileId && typeof window.currentProfileId !== 'undefined') {
+                window.currentProfileId = profileId;
+            }
+
+            // Iniciar el temporizador
+            window.startReadingTimer(storyId);
+
+            // Detener el temporizador al abandonar la página
+            window.addEventListener('beforeunload', function() {
+                if (typeof window.stopReadingTimer === 'function') {
+                    window.stopReadingTimer();
+                }
+            });
+        } else {
+            console.log('⚠️ Funciones globales no disponibles, usando implementación local');
+
+            // Implementación local si las funciones globales no están disponibles
+            let readingSeconds = 0;
+            let readingTimer = setInterval(() => {
+                readingSeconds++;
+
+                // Actualizar el contador en la interfaz
+                const timeDisplay = document.getElementById('reading-time-display');
+                if (timeDisplay) {
+                    const minutes = Math.floor(readingSeconds / 60);
+                    const seconds = readingSeconds % 60;
+                    timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+
+                // Cada 30 segundos, enviar actualización al servidor
+                if (readingSeconds % 30 === 0) {
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                    fetch('/library/reading-tracker/update-time/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken,
+                        },
+                        body: JSON.stringify({
+                            cuento_id: storyId,
+                            tiempo_lectura: 30, // Enviar 30 segundos cada vez
+                            profile_id: profileId // Incluir el ID del perfil si está disponible
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log(`✅ Tiempo de lectura actualizado: 30 segundos, acumulado: ${data.tiempo_total || 'N/A'} segundos`);
+                        } else {
+                            console.error('❌ Error al actualizar tiempo de lectura:', data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Error en la solicitud:', error);
+                    });
+                }
+            }, 1000);
+
+            // Detener al abandonar la página
+            window.addEventListener('beforeunload', () => {
+                if (readingTimer) {
+                    clearInterval(readingTimer);
+
+                    // Enviar actualización final
+                    const remainingSeconds = readingSeconds % 30;
+                    if (remainingSeconds > 0) {
+                        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                        // Usar sendBeacon para asegurar que se envíe incluso al cerrar la página
+                        const data = JSON.stringify({
+                            cuento_id: storyId,
+                            tiempo_lectura: remainingSeconds,
+                            profile_id: profileId
+                        });
+
+                        navigator.sendBeacon(
+                            '/library/reading-tracker/update-time/',
+                            new Blob([data], {type: 'application/json'})
+                        );
+
+                        console.log(`📤 Enviando actualización final: ${remainingSeconds} segundos`);
+                    }
+                }
+            });
+        }
+    }
+
+    // CONFIGURAR MODAL PARA GUARDAR EN BIBLIOTECA
+    setupSaveToLibraryModal();
+});
+
+function setupSaveToLibraryModal() {
+    const saveBtn = document.getElementById('save-to-library-btn');
+    const modal = document.getElementById('saveToLibraryModal');
+    const closeBtn = document.getElementById('closeSaveModal');
+    const cancelBtn = document.getElementById('cancelSaveBtn');
+    const confirmBtn = document.getElementById('confirmSaveBtn');
+
+    if (saveBtn && modal) {
+        saveBtn.addEventListener('click', function() {
+            const cuentoId = this.dataset.cuentoId;
+
+            // Verificar si ya está en biblioteca
+            if (this.textContent.includes('Ya en Biblioteca')) {
+                showMessage('Este cuento ya está guardado en tu biblioteca', 'info');
+                return;
+            }
+
+            // Mostrar modal
+            modal.style.display = 'flex';
+
+            // Configurar botón de confirmación
+            confirmBtn.onclick = () => saveToLibrary(cuentoId);
+        });
+
+        // Configurar botones para cerrar modal
+        [closeBtn, cancelBtn].forEach(btn => {
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                });
+            }
+        });
+
+        // Cerrar modal al hacer click fuera
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Cerrar modal con tecla Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            }
+        });
+    }
+}
+
+function saveToLibrary(cuentoId) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const modal = document.getElementById('saveToLibraryModal');
+
+    fetch(`/stories/cuento/${cuentoId}/guardar/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        modal.style.display = 'none';
+
+        if (data.success) {
+            showMessage(data.message, 'success');
+
+            // Actualizar botón
+            const saveBtn = document.getElementById('save-to-library-btn');
+            if (saveBtn) {
+                saveBtn.innerHTML = `
+                    <div class="btn-icon">✅</div>
+                    <span>Ya en Biblioteca</span>
+                `;
+                saveBtn.disabled = true;
+                saveBtn.style.opacity = '0.7';
+            }
+
+            // Redirigir después de un momento
+            if (data.redirect_url) {
+                setTimeout(() => {
+                    window.location.href = data.redirect_url;
+                }, 2000);
+            }
+        } else {
+            showMessage(data.message || 'Error al guardar en biblioteca', 'error');
+        }
+    })
+    .catch(error => {
+        modal.style.display = 'none';
+        console.error('Error:', error);
+        showMessage('Error al guardar en biblioteca', 'error');
+    });
+}
+
+function showMessage(mensaje, tipo = 'info') {
+    console.log(`📢 ${tipo.toUpperCase()}: ${mensaje}`);
+
+    const messageDiv = document.createElement('div');
+    messageDiv.textContent = mensaje;
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        z-index: 1000;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+    `;
+
+    switch (tipo) {
+        case 'success':
+            messageDiv.style.backgroundColor = '#10b981';
+            break;
+        case 'error':
+            messageDiv.style.backgroundColor = '#ef4444';
+            break;
+        case 'info':
+            messageDiv.style.backgroundColor = '#3b82f6';
+            break;
+        default:
+            messageDiv.style.backgroundColor = '#6b7280';
+    }
+
+    document.body.appendChild(messageDiv);
+
+    setTimeout(() => {
+        messageDiv.style.opacity = '1';
+        messageDiv.style.transform = 'translateX(0)';
+    }, 100);
+
+    setTimeout(() => {
+        messageDiv.style.opacity = '0';
+        messageDiv.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.parentNode.removeChild(messageDiv);
+            }
+        }, 300);
+    }, 3000);
+}
+</script>
+
+<!-- Script adicional para forzar aplicación del modo oscuro -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Verificar si el modo oscuro está activo y forzar aplicación
+    const isDarkMode = document.documentElement.classList.contains('dark-mode');
+
+    if (isDarkMode) {
+        console.log('🌙 Modo oscuro detectado en generated_story');
+
+        // Forzar aplicación de estilos de modo oscuro
+        const storyContainer = document.querySelector('.story-container');
+        const storyCard = document.querySelector('.story-card');
+
+        if (storyContainer) {
+            storyContainer.style.setProperty('background', 'var(--bg-primary)', 'important');
+            storyContainer.style.setProperty('color', 'var(--text-primary)', 'important');
+        }
+
+        if (storyCard) {
+            storyCard.style.setProperty('background', 'var(--card-bg)', 'important');
+        }
+
+        // Aplicar a todas las secciones
+        const sections = document.querySelectorAll('.story-image-section, .story-content-section, .story-actions');
+        sections.forEach(section => {
+            section.style.setProperty('background', 'var(--card-bg)', 'important');
+        });
+
+        // Aplicar a texto
+        const textElements = document.querySelectorAll('.story-text, .story-text p');
+        textElements.forEach(element => {
+            element.style.setProperty('color', 'var(--text-primary)', 'important');
+        });
+    }
+});
+</script>
+
+<style>
+/* Estilos para el contador de tiempo de lectura */
+.reading-time-display {
+    background-color: rgba(124, 58, 237, 0.1);
+    border-radius: 8px;
+    padding: 8px 16px;
+    margin-bottom: 16px;
+    display: inline-flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+.reading-time-label {
+    margin-right: 8px;
+    color: #7C3AED;
+}
+
+#reading-time-display {
+    font-family: monospace;
+    font-size: 1.1em;
+    color: #7C3AED;
+}
+
+/* Estilos para el modal de guardar en biblioteca */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 0;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    padding: 20px 24px 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 4px;
+}
+
+.modal-close:hover {
+    color: #374151;
+}
+
+.modal-body {
+    padding: 20px 24px;
+    text-align: center;
+}
+
+.success-icon {
+    width: 64px;
+    height: 64px;
+    background-color: #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+}
+
+.success-icon i {
+    font-size: 24px;
+    color: white;
+}
+
+.main-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #1f2937;
+    margin-bottom: 8px;
+}
+
+.info-text {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.modal-footer {
+    padding: 0 24px 24px 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-secondary {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background-color: #e5e7eb;
+}
+
+.btn-primary {
+    background-color: #7c3aed;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #6d28d9;
+}
+</style>
+{% endblock %}

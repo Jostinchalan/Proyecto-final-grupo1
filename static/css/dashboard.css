@@ -1,0 +1,950 @@
+/*static/css/dashboard.css*/
+/* Dashboard.css - es de base.html */
+/* Dashboard.css - es de base.html */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  height: 100%;
+  overflow: hidden; /* CRÍTICO: Sin scroll en body */
+}
+
+.dashboard-container {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px; /* Sidebar izq | Contenido | Sidebar der */
+  grid-template-rows: 80px 1fr; /* Barra superior | Contenido */
+  grid-template-areas:
+    "sidebar topbar rightbar"
+    "sidebar content rightbar";
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: #f8f9fa;
+}
+
+/* SIDEBAR IZQUIERDO - COMPLETAMENTE FIJO */
+.sidebar {
+  grid-area: sidebar;
+  background: white;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Solo si el menú es muy largo */
+  overflow-x: hidden;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 100;
+}
+
+.logo {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.logo img {
+  width: 40px;
+  height: 40px;
+}
+
+.logo h1 {
+  color: #8B5CF6;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.menu-section {
+  padding: 1.5rem;
+  flex-shrink: 0;
+}
+
+.menu-section h2 {
+  color: #9CA3AF;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  letter-spacing: 1px;
+}
+
+.menu-section nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.menu-section nav a {
+  color: #374151;
+  text-decoration: none;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.menu-section nav a:hover {
+  background: #F3F4F6;
+  color: #8B5CF6;
+}
+
+.menu-section nav a.active {
+  background: #DDD6FE;
+  color: #8B5CF6;
+  font-weight: 600;
+}
+
+/* BARRA SUPERIOR - COMPLETAMENTE FIJA */
+.top-bar {
+  grid-area: topbar;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  z-index: 50;
+  position: sticky;
+  top: 0;
+}
+
+.search-bar {
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #D1D5DB;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  background: #F9FAFB;
+}
+
+.search-bar input::placeholder {
+  color: #9CA3AF;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto; /* <-- clave para empujar a la derecha */
+
+}
+
+.user-profile span {
+  font-weight: 600;
+  color: #374151;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ÁREA DE CONTENIDO - AQUÍ VA EL SCROLL */
+.dashboard-content {
+  grid-area: content;
+  overflow-y: auto; /* SOLO AQUÍ HAY SCROLL */
+  overflow-x: hidden;
+  background: #f8f9fa;
+  padding: 2rem;
+  height: calc(100vh - 80px); /* Altura total menos barra superior */
+}
+
+/* SIDEBAR DERECHO - COMPLETAMENTE FIJO */
+.right-sidebar {
+  grid-area: rightbar;
+  background: white;
+  border-left: 1px solid #e5e7eb;
+  overflow-y: auto; /* Solo si las estadísticas son muy largas */
+  overflow-x: hidden;
+  padding: 1.5rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 100;
+}
+
+/* Contenedor main-content ya no es necesario con CSS Grid */
+.main-content {
+  display: contents; /* Permite que los hijos usen el grid del padre */
+}
+
+/* BANNER DE BIENVENIDA - DISEÑO CORREGIDO */
+.welcome-banner {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
+  color: white !important;
+  padding: 2rem !important;
+  border-radius: 16px !important;
+  text-align: center !important;
+  margin-bottom: 2rem !important;
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.welcome-banner h1 {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  margin: 0 0 0.5rem 0 !important;
+  letter-spacing: 0.5px !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+  line-height: 1.2 !important;
+  color: white !important;
+  white-space: nowrap !important;
+  display: inline-block !important;
+  max-width: 100% !important;
+}
+
+.welcome-banner p {
+  font-size: 0.9rem !important;
+  font-weight: 400 !important;
+  opacity: 0.9 !important;
+  letter-spacing: 0.3px !important;
+  line-height: 1.4 !important;
+  margin: 0 !important;
+  color: white !important;
+}
+
+.section {
+  margin-bottom: 3rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.controls button {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.controls button:hover {
+  background: #f3f4f6;
+  border-color: #8B5CF6;
+}
+
+.story-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.story-card {
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.story-card:hover {
+  transform: translateY(-5px);
+}
+
+.story-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.story-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tags {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tags span {
+  background: rgba(139, 92, 246, 0.9);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.story-info {
+  padding: 1.5rem;
+}
+
+.story-info h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.5rem 0;
+}
+
+.story-info p {
+  color: #6B7280;
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+}
+
+.author {
+  color: #8B5CF6;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.popular-stories {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.popular-story-card {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+}
+
+.popular-story-card:hover {
+  transform: translateX(5px);
+}
+
+.popular-story-icon {
+  width: 40px;
+  height: 40px;
+  background: #DDD6FE;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8B5CF6;
+  flex-shrink: 0;
+}
+
+.popular-story-info h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.25rem 0;
+}
+
+.popular-story-info p {
+  color: #6B7280;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.welcome-message {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  margin-top: 2rem;
+}
+
+.welcome-message p {
+  color: #6B7280;
+  line-height: 1.6;
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* Estilos para el sidebar derecho */
+.user-card {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: white;
+}
+
+.user-card-header {
+  margin-bottom: 1rem;
+}
+
+.user-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto;
+  border: 3px solid white;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-card-content h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.user-card-content p {
+  font-size: 0.875rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.stats-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.stats-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.stats-card-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.stat-item:last-child {
+  border-bottom: none;
+}
+
+.stat-icon {
+  width: 30px;
+  height: 30px;
+  background: #DDD6FE;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8B5CF6;
+  font-weight: 600;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.stat-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-info p {
+  font-size: 0.75rem;
+  color: #6B7280;
+  margin: 0;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #8B5CF6;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.chart-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.chart-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 1rem 0;
+}
+
+.chart {
+  display: flex;
+  align-items: end;
+  gap: 0.5rem;
+  height: 100px;
+}
+
+.chart-bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chart-bar-value {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  border-radius: 0.25rem;
+  width: 100%;
+  min-height: 4px;
+}
+
+.chart-bar-label {
+  font-size: 0.75rem;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+/* Responsive - BANNER RESPONSIVE CORREGIDO */
+@media (max-width: 1200px) {
+  .dashboard-container {
+    grid-template-columns: 280px 1fr; /* Sin sidebar derecho */
+    grid-template-areas:
+      "sidebar topbar"
+      "sidebar content";
+  }
+
+  .right-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    grid-template-columns: 1fr; /* Solo contenido */
+    grid-template-rows: 60px 1fr;
+    grid-template-areas:
+      "topbar"
+      "content";
+  }
+
+  .sidebar {
+    display: none; /* O implementar menú hamburguesa */
+  }
+
+  .top-bar {
+    padding: 1rem;
+    border-left: none;
+    border-right: none;
+  }
+
+  .dashboard-content {
+    padding: 1rem;
+  }
+
+  .search-bar {
+    max-width: 200px;
+  }
+
+  .welcome-banner {
+    padding: 1.5rem 1rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .welcome-banner h1 {
+    font-size: 1.6rem !important;
+    letter-spacing: 0.3px !important;
+  }
+
+  .welcome-banner p {
+    font-size: 0.8rem !important;
+  }
+
+  .story-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-banner h1 {
+    font-size: 1.3rem !important;
+    letter-spacing: 0.2px !important;
+  }
+
+  .welcome-banner p {
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .welcome-banner h1 {
+    font-size: 1.1rem !important;
+    letter-spacing: 0.1px !important;
+  }
+}
+
+/* Variables CSS para modo claro y oscuro */
+:root {
+  --bg-primary: #f5f5f5;
+  --bg-secondary: #ffffff;
+  --bg-sidebar: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --border-color: #e5e7eb;
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+  --hover-bg: #f3f4f6;
+  --highlight-color: #8b5cf6;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --settings-content-bg: #ffffff;
+  --settings-header-bg: #8b5cf6;
+}
+
+/* Variables para modo oscuro */
+html.dark-mode {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-sidebar: #1e1e1e;
+  --text-primary: #f5f5f5;
+  --text-secondary: #b0b0b0;
+  --border-color: #404040;
+  --card-bg: #2d2d2d;
+  --input-bg: #3a3a3a;
+  --hover-bg: #3a3a3a;
+  --highlight-color: #8b5cf6;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --settings-content-bg: #2d3748; /* Color específico para settings */
+  --settings-header-bg: #8b5cf6;
+}
+
+/* Aplicar variables a todos los elementos */
+body {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  transition: all 0.3s ease;
+}
+
+/* Dashboard container */
+.dashboard-container {
+  background-color: var(--bg-primary) !important;
+}
+
+/* Sidebar izquierdo */
+.sidebar {
+  background-color: var(--bg-sidebar) !important;
+  border-right: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.sidebar .logo {
+  color: var(--text-primary) !important;
+}
+
+.sidebar .logo h1 {
+  color: var(--text-primary) !important;
+}
+
+.sidebar .menu-section h2 {
+  color: var(--text-secondary) !important;
+}
+
+.sidebar .menu-section nav a {
+  color: var(--text-primary) !important;
+  transition: all 0.3s ease;
+}
+
+.sidebar .menu-section nav a:hover {
+  background-color: var(--hover-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+.sidebar .menu-section nav a.active {
+  background-color: var(--highlight-color) !important;
+  color: white !important;
+}
+
+/* Contenido principal */
+.main-content {
+  background-color: var(--bg-primary) !important;
+}
+
+/* Barra superior */
+.top-bar {
+  background-color: var(--bg-secondary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow);
+}
+
+.search-bar input {
+  background-color: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.search-bar input::placeholder {
+  color: var(--text-secondary) !important;
+}
+
+.user-profile span {
+  color: var(--text-primary) !important;
+}
+
+/* Contenido del dashboard */
+.dashboard-content {
+  background-color: var(--bg-primary) !important;
+}
+
+/* NOTA: El welcome-banner mantiene su diseño morado en ambos modos */
+
+/* Secciones */
+.section {
+  background-color: var(--bg-primary) !important;
+}
+
+.section-header h2 {
+  color: var(--text-primary) !important;
+}
+
+.controls button {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.controls button:hover {
+  background-color: var(--hover-bg) !important;
+}
+
+/* Story cards */
+.story-card {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow);
+}
+
+.story-card .story-info h3 {
+  color: var(--text-primary) !important;
+}
+
+.story-card .story-info p {
+  color: var(--text-secondary) !important;
+}
+
+.story-card .author span {
+  color: var(--text-secondary) !important;
+}
+
+/* Popular stories */
+.popular-story-card {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow);
+}
+
+.popular-story-card h3 {
+  color: var(--text-primary) !important;
+}
+
+.popular-story-card p {
+  color: var(--text-secondary) !important;
+}
+
+.popular-story-icon {
+  color: var(--text-primary) !important;
+}
+
+/* Sidebar derecho */
+.right-sidebar {
+  background-color: var(--bg-sidebar) !important;
+  border-left: 1px solid var(--border-color) !important;
+}
+
+/* User card */
+.user-card {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow);
+}
+
+.user-card h3 {
+  color: var(--text-primary) !important;
+}
+
+.user-card p {
+  color: var(--text-secondary) !important;
+}
+
+/* Stats card */
+.stats-card {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow);
+}
+
+.stats-card-header h3 {
+  color: var(--text-primary) !important;
+}
+
+.stats-card-header svg {
+  color: var(--text-primary) !important;
+}
+
+.stat-item {
+  color: var(--text-primary) !important;
+}
+
+.stat-info p {
+  color: var(--text-secondary) !important;
+}
+
+.stat-value {
+  color: var(--text-primary) !important;
+}
+
+/* Chart card */
+.chart-card {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow);
+}
+
+.chart-card h3 {
+  color: var(--text-primary) !important;
+}
+
+.chart-bar-label {
+  color: var(--text-secondary) !important;
+}
+
+/* Welcome message */
+.welcome-message {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow);
+}
+
+.welcome-message p {
+  color: var(--text-primary) !important;
+}
+
+/* Tags en story cards */
+.tags span {
+  background-color: var(--highlight-color) !important;
+  color: white !important;
+}
+
+/* Scrollbars para modo oscuro */
+html.dark-mode ::-webkit-scrollbar {
+  width: 8px;
+}
+
+html.dark-mode ::-webkit-scrollbar-track {
+  background: var(--bg-sidebar);
+}
+
+html.dark-mode ::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+html.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Asegurar que todos los elementos hereden los colores */
+html.dark-mode * {
+  border-color: var(--border-color) !important;
+}
+
+/* Específico para inputs y selects */
+html.dark-mode input,
+html.dark-mode select,
+html.dark-mode textarea {
+  background-color: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark-mode input::placeholder {
+  color: var(--text-secondary) !important;
+}
+
+/* Botones */
+html.dark-mode button:not(.save-button):not(.avatar-button):not(.save-avatar-button):not(.cancel-avatar-button) {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark-mode button:not(.save-button):not(.avatar-button):not(.save-avatar-button):not(.cancel-avatar-button):hover {
+  background-color: var(--hover-bg) !important;
+}
+
+/* Estilos específicos para la página de configuraciones */
+.settings-container {
+  background-color: var(--bg-primary) !important;
+}
+
+.settings-header {
+  background: var(--settings-header-bg) !important;
+  color: white !important;
+}
+
+.settings-content {
+  background-color: var(--settings-content-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark-mode .settings-content {
+  background-color: #1e1e1e !important;
+}
+
+/* Transiciones suaves */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+}

@@ -1,0 +1,509 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="create-perfil-container">
+    <!-- Encabezado morado estilo biblioteca -->
+    <div class="page-title-banner">
+        <h1>CREAR PERFIL INFANTIL</h1>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="form-container">
+        <!-- NUEVA SECCIÓN DE FOTO DE PERFIL -->
+        <div class="photo-section">
+            <div class="photo-upload-container">
+                <div class="photo-preview" id="photoPreview">
+                    <div class="default-avatar" id="defaultAvatar">
+                        <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+                            <circle cx="50" cy="40" r="15" fill="#FDBCB4"/>
+                            <path d="M35 25 C35 15, 65 15, 65 25 L65 35 C65 45, 35 45, 35 35 Z" fill="#8B4513"/>
+                            <circle cx="45" cy="38" r="2" fill="#000"/>
+                            <circle cx="55" cy="38" r="2" fill="#000"/>
+                            <path d="M45 45 Q50 50 55 45" stroke="#000" stroke-width="1.5" fill="none"/>
+                            <rect x="40" y="55" width="20" height="25" rx="10" fill="#8B5CF6"/>
+                        </svg>
+                    </div>
+                    <img id="photoImg" style="display: none;" />
+                </div>
+                <button type="button" class="btn-upload-photo" onclick="document.getElementById('foto_perfil_input').click()">
+                    <i class="fas fa-camera"></i>
+                    AÑADIR FOTO
+                </button>
+                <p class="photo-help">Sube una foto para personalizar el perfil</p>
+            </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="perfil-form" id="perfilForm">
+            {% csrf_token %}
+
+            <!-- Campo oculto para la foto -->
+            <div style="display: none;">
+                {{ form.foto_perfil }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.nombre.id_for_label }}">
+                    {{ form.nombre.label }}
+                </label>
+                {{ form.nombre }}
+                {% if form.nombre.errors %}
+                    <div class="error-message">
+                        {{ form.nombre.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.edad.id_for_label }}">
+                    {{ form.edad.label }}
+                </label>
+                {{ form.edad }}
+                {% if form.edad.errors %}
+                    <div class="error-message">
+                        {{ form.edad.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.genero.id_for_label }}">
+                    {{ form.genero.label }}
+                </label>
+                {{ form.genero }}
+                {% if form.genero.errors %}
+                    <div class="error-message">
+                        {{ form.genero.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.temas_preferidos.id_for_label }}">
+                    {{ form.temas_preferidos.label }}
+                </label>
+                {{ form.temas_preferidos }}
+                {% if form.temas_preferidos.errors %}
+                    <div class="error-message">
+                        {{ form.temas_preferidos.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.personajes_favoritos.id_for_label }}">
+                    {{ form.personajes_favoritos.label }}
+                </label>
+                {{ form.personajes_favoritos }}
+                {% if form.personajes_favoritos.errors %}
+                    <div class="error-message">
+                        {{ form.personajes_favoritos.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-crear">
+                    Crear Perfil
+                </button>
+                <a href="{% url 'user:perfil_list' %}" class="btn-cancelar">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* Usar variables CSS del modo oscuro */
+.create-perfil-container {
+    padding: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: calc(100vh - 120px);
+}
+
+/* Encabezado morado estilo biblioteca */
+.page-title-banner {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.page-title-banner h1 {
+    font-size: 2rem; /* Reducir el tamaño base para que quepa mejor */
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.5px; /* Reducir el espaciado entre letras */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    white-space: nowrap; /* Mantiene el texto en una sola línea */
+    display: inline-block;
+    max-width: 100%;
+    /* Remover overflow hidden y text-overflow para evitar el corte */
+}
+
+.alert {
+    background: #d4edda;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid #c3e6cb;
+}
+
+.alert.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+.form-container {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+/* NUEVA SECCIÓN DE FOTO */
+.photo-section {
+    margin-bottom: 2rem;
+    text-align: center;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.photo-upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.photo-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #8B5CF6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.photo-preview:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+}
+
+.default-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#photoImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.btn-upload-photo {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.btn-upload-photo:hover {
+    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+}
+
+.photo-help {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin: 0;
+    font-style: italic;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.form-control::placeholder {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-crear {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    color: white;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex: 1;
+    transition: all 0.2s;
+}
+
+.btn-crear:hover {
+    background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
+    transform: translateY(-1px);
+}
+
+.btn-cancelar {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    padding: 0.75rem 2rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-cancelar:hover {
+    background: var(--hover-bg);
+    border-color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .create-perfil-container {
+        padding: 1rem;
+        max-width: 100%; /* Usar todo el ancho disponible */
+    }
+
+    .page-title-banner {
+        padding: 1.5rem 1rem; /* Reducir padding lateral */
+        margin-bottom: 1.5rem;
+    }
+
+    .page-title-banner h1 {
+        font-size: 1.6rem; /* Tamaño más pequeño para tablets */
+        letter-spacing: 0.3px;
+    }
+
+    .form-container {
+        padding: 1.5rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .photo-preview {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .create-perfil-container {
+        padding: 0.5rem;
+    }
+
+    .page-title-banner {
+        padding: 1rem 0.5rem; /* Padding aún más pequeño */
+    }
+
+    .page-title-banner h1 {
+        font-size: 1.3rem; /* Más pequeño para móviles */
+        letter-spacing: 0.2px;
+    }
+}
+
+@media (max-width: 360px) {
+    .page-title-banner h1 {
+        font-size: 1.1rem; /* Para pantallas muy pequeñas */
+        letter-spacing: 0.1px;
+    }
+}
+
+/* Media query específica para asegurar que el texto completo sea visible */
+@media (max-width: 600px) {
+    .page-title-banner h1 {
+        font-size: 1.4rem;
+        letter-spacing: 0.2px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fotoInput = document.getElementById('foto_perfil_input');
+    const photoPreview = document.getElementById('photoPreview');
+    const defaultAvatar = document.getElementById('defaultAvatar');
+    const photoImg = document.getElementById('photoImg');
+    const generoSelect = document.querySelector('select[name="genero"]');
+
+    // Manejar cambio de foto
+    fotoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Validar tipo de archivo
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                alert('Solo se permiten archivos JPG, JPEG, PNG o GIF.');
+                fotoInput.value = '';
+                return;
+            }
+
+            // Validar tamaño (5MB máximo)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('La imagen no puede ser mayor a 5MB.');
+                fotoInput.value = '';
+                return;
+            }
+
+            // Mostrar preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                photoImg.src = e.target.result;
+                photoImg.style.display = 'block';
+                defaultAvatar.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Actualizar avatar según género
+    if (generoSelect) {
+        generoSelect.addEventListener('change', function() {
+            if (!photoImg.src || photoImg.style.display === 'none') {
+                updateDefaultAvatar(this.value);
+            }
+        });
+    }
+
+    function updateDefaultAvatar(genero) {
+        let avatarSVG = '';
+        let bgClass = '';
+
+        if (genero === 'M') {
+            bgClass = 'linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%)';
+            avatarSVG = `
+                <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+                    <circle cx="50" cy="40" r="15" fill="#FDBCB4"/>
+                    <path d="M35 25 C35 15, 65 15, 65 25 L65 35 C65 45, 35 45, 35 35 Z" fill="#8B4513"/>
+                    <circle cx="45" cy="38" r="2" fill="#000"/>
+                    <circle cx="55" cy="38" r="2" fill="#000"/>
+                    <path d="M45 45 Q50 50 55 45" stroke="#000" stroke-width="1.5" fill="none"/>
+                    <rect x="40" y="55" width="20" height="25" rx="10" fill="#4F46E5"/>
+                </svg>
+            `;
+        } else if (genero === 'F') {
+            bgClass = 'linear-gradient(135deg, #FCE7F3 0%, #FBCFE8 100%)';
+            avatarSVG = `
+                <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+                    <circle cx="50" cy="40" r="15" fill="#FDBCB4"/>
+                    <path d="M30 25 C30 10, 70 10, 70 25 L70 40 C70 50, 30 50, 30 40 Z" fill="#8B4513"/>
+                    <circle cx="25" cy="30" r="8" fill="#8B4513"/>
+                    <circle cx="75" cy="30" r="8" fill="#8B4513"/>
+                    <circle cx="45" cy="38" r="2" fill="#000"/>
+                    <circle cx="55" cy="38" r="2" fill="#000"/>
+                    <path d="M45 45 Q50 50 55 45" stroke="#000" stroke-width="1.5" fill="none"/>
+                    <rect x="40" y="55" width="20" height="25" rx="10" fill="#EC4899"/>
+                </svg>
+            `;
+        } else {
+            bgClass = 'linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%)';
+            avatarSVG = `
+                <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+                    <circle cx="50" cy="40" r="15" fill="#FDBCB4"/>
+                    <path d="M35 25 C35 15, 65 15, 65 25 L65 35 C65 45, 35 45, 35 35 Z" fill="#8B4513"/>
+                    <circle cx="45" cy="38" r="2" fill="#000"/>
+                    <circle cx="55" cy="38" r="2" fill="#000"/>
+                    <path d="M45 45 Q50 50 55 45" stroke="#000" stroke-width="1.5" fill="none"/>
+                    <rect x="40" y="55" width="20" height="25" rx="10" fill="#10B981"/>
+                </svg>
+            `;
+        }
+
+        photoPreview.style.background = bgClass;
+        defaultAvatar.innerHTML = avatarSVG;
+    }
+});
+</script>
+{% endblock %}

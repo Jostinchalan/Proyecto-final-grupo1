@@ -1,0 +1,659 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="story-generator-page">
+    <!-- Encabezado morado estilo biblioteca -->
+    <div class="page-title-banner">
+        <h1>GENERAR CUENTO</h1>
+    </div>
+
+    <!-- Selector de perfiles -->
+    <div class="profiles-selector">
+        <h2>Selecciona un perfil</h2>
+        <div class="profiles-carousel">
+            {% for perfil in perfiles %}
+                <div class="profile-card" data-perfil-id="{{ perfil.id }}" onclick="seleccionarPerfil({{ perfil.id }})">
+                    <div class="profile-image-container">
+                        {% if perfil.foto_perfil %}
+                            <img src="{{ perfil.foto_perfil.url }}" alt="{{ perfil.nombre }}" class="profile-image">
+                        {% else %}
+                            <!-- Imagen por defecto si no tiene foto -->
+                            <img src="{% static 'images/robot1.png' %}" alt="{{ perfil.nombre }}" class="profile-image">
+                        {% endif %}
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-name" title="{{ perfil.nombre }}">{{ perfil.nombre|upper }}</div>
+                        <div class="profile-age">{{ perfil.edad }} años</div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <!-- Indicador de scroll -->
+        <div class="scroll-indicator">
+            <span>← Desliza para ver más perfiles →</span>
+        </div>
+    </div>
+
+    <!-- Formulario de generación de cuento -->
+    <div class="story-form-container">
+        <h2>Información del Cuento</h2>
+        <form method="post" id="storyForm" class="story-form">
+            {% csrf_token %}
+
+            <!-- Campo oculto para el ID del perfil seleccionado -->
+            <input type="hidden" name="perfil_id" id="perfil_id" value="">
+
+            <div class="form-group">
+                <label for="titulo">Título del Cuento:</label>
+                <input type="text" id="titulo" name="titulo" class="form-control" placeholder="Ingresa un título para el cuento" required>
+            </div>
+
+            <div class="form-group">
+                <label for="personaje">Personaje Principal:</label>
+                <div class="custom-select-container">
+                    <select id="personaje" name="personaje" class="form-control custom-select" required>
+                        <option value="" disabled selected>Selecciona un personaje</option>
+                        <option value="nuevo">➕ Insertar nuevo</option>
+                    </select>
+                    <input type="text" id="nuevo_personaje" name="nuevo_personaje" class="form-control hidden" placeholder="Ingresa un nuevo personaje">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="tema">Tema del Cuento:</label>
+                <div class="custom-select-container">
+                    <select id="tema" name="tema" class="form-control custom-select" required>
+                        <option value="" disabled selected>Selecciona un tema</option>
+                        <option value="nuevo">➕ Insertar nuevo</option>
+                    </select>
+                    <input type="text" id="nuevo_tema" name="nuevo_tema" class="form-control hidden" placeholder="Ingresa un nuevo tema">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="edad">Edad del Niño:</label>
+                <select id="edad" name="edad" class="form-control" required>
+                    <option value="" disabled selected>Selecciona la edad</option>
+                    {% for i in "123456789"|make_list %}
+                        <option value="{{ i }}">{{ i }} años</option>
+                    {% endfor %}
+                    {% for i in "0123456789"|make_list %}
+                        <option value="1{{ i }}">1{{ i }} años</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="longitud">Longitud del Cuento:</label>
+                <select id="longitud" name="longitud" class="form-control" required>
+                    <option value="" disabled selected>Selecciona la longitud</option>
+                    <option value="corto">Corto (5 minutos)</option>
+                    <option value="medio">Medio (10 minutos)</option>
+                    <option value="largo">Largo (15 minutos)</option>
+                </select>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="guardar_datos" name="guardar_datos" class="form-checkbox">
+                <label for="guardar_datos">Guardar nuevos datos en el perfil</label>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-generate">Generar Cuento</button>
+                <button type="button" class="btn-clear" onclick="limpiarFormulario()">Limpiar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* Usar variables CSS del modo oscuro */
+.story-generator-page {
+    background: var(--bg-primary);
+    padding: 2rem;
+    min-height: calc(100vh - 120px);
+    color: var(--text-primary);
+}
+
+/* Encabezado morado estilo biblioteca */
+.page-title-banner {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.page-title-banner h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Selector de perfiles */
+.profiles-selector {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+    position: relative;
+}
+
+.profiles-selector h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.profiles-carousel {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 1rem 0 1.5rem 0;
+    /* Barra de scroll más visible */
+    scrollbar-width: thick;
+    scrollbar-color: #8B5CF6 #e5e7eb;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Estilos mejorados para la barra de scroll */
+.profiles-carousel::-webkit-scrollbar {
+    height: 12px;
+}
+
+.profiles-carousel::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 6px;
+    margin: 0 10px;
+}
+
+.profiles-carousel::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #8B5CF6, #7C3AED);
+    border-radius: 6px;
+    border: 2px solid #f1f5f9;
+}
+
+.profiles-carousel::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, #7C3AED, #6D28D9);
+}
+
+.profiles-carousel::-webkit-scrollbar-corner {
+    background: #f1f5f9;
+}
+
+.profile-card {
+    min-width: 150px;
+    max-width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.25rem;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    background: var(--card-bg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0; /* Evita que se compriman */
+}
+
+.profile-card:hover {
+    background: var(--hover-bg);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(139, 92, 246, 0.2);
+}
+
+.profile-card.selected {
+    background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+    border: 2px solid #8B5CF6;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(139, 92, 246, 0.3);
+}
+
+.profile-image-container {
+    margin-bottom: 1rem;
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid rgba(139, 92, 246, 0.3);
+    transition: all 0.3s ease;
+}
+
+.profile-card:hover .profile-image-container {
+    border-color: rgba(139, 92, 246, 0.6);
+    transform: scale(1.05);
+}
+
+.profile-card.selected .profile-image-container {
+    border-color: #8B5CF6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block; /* Asegurar que se muestre */
+}
+
+.profile-info {
+    text-align: center;
+    width: 100%;
+}
+
+.profile-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 130px;
+    letter-spacing: 0.5px;
+}
+
+.profile-age {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    background: rgba(139, 92, 246, 0.15);
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    display: inline-block;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.profile-card.selected .profile-age {
+    background: rgba(139, 92, 246, 0.25);
+    color: #8B5CF6;
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+/* Indicador de scroll */
+.scroll-indicator {
+    text-align: center;
+    margin-top: 0.5rem;
+    opacity: 0.7;
+}
+
+.scroll-indicator span {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    background: rgba(139, 92, 246, 0.1);
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+/* Formulario */
+.story-form-container {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+.story-form-container h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+.story-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.form-control {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #8B5CF6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.form-control::placeholder {
+    color: var(--text-secondary);
+}
+
+.custom-select-container {
+    position: relative;
+}
+
+.custom-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+.hidden {
+    display: none;
+}
+
+.checkbox-group {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.form-checkbox {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 4px;
+    border: 2px solid var(--border-color);
+    cursor: pointer;
+    accent-color: #8B5CF6;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn-generate {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    color: white;
+    border: none;
+    padding: 0.875rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+}
+
+.btn-generate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.btn-clear {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    padding: 0.875rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-clear:hover {
+    background: var(--hover-bg);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .story-generator-page {
+        padding: 1rem;
+    }
+
+    .page-title-banner {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .page-title-banner h1 {
+        font-size: 2rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .profile-card {
+        min-width: 130px;
+        max-width: 130px;
+    }
+
+    .profile-image-container {
+        width: 70px;
+        height: 70px;
+    }
+
+    .profiles-carousel {
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title-banner h1 {
+        font-size: 1.5rem;
+    }
+
+    .profile-card {
+        min-width: 120px;
+        max-width: 120px;
+        padding: 1rem;
+    }
+
+    .profile-image-container {
+        width: 60px;
+        height: 60px;
+    }
+
+    .profile-name {
+        font-size: 0.9rem;
+    }
+
+    .profile-age {
+        font-size: 0.75rem;
+    }
+}
+</style>
+
+<script>
+// Datos de perfiles para JavaScript
+const perfilesData = [
+    {% for perfil in perfiles %}
+    {
+        id: {{ perfil.id }},
+        nombre: "{{ perfil.nombre|escapejs }}",
+        edad: {{ perfil.edad }},
+        temas: [{% for tema in perfil.temas_lista %}"{{ tema|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+        personajes: [{% for personaje in perfil.personajes_lista %}"{{ personaje|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}]
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+];
+
+// Función para seleccionar un perfil
+function seleccionarPerfil(perfilId) {
+    // Remover selección anterior
+    document.querySelectorAll('.profile-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+
+    // Seleccionar nuevo perfil
+    const selectedCard = document.querySelector(`[data-perfil-id="${perfilId}"]`);
+    if (selectedCard) {
+        selectedCard.classList.add('selected');
+    }
+
+    // Buscar datos del perfil
+    const perfil = perfilesData.find(p => p.id === perfilId);
+    if (!perfil) return;
+
+    // Actualizar campo oculto
+    document.getElementById('perfil_id').value = perfilId;
+
+    // Auto-completar edad
+    document.getElementById('edad').value = perfil.edad;
+
+    // Actualizar dropdown de personajes
+    actualizarDropdownPersonajes(perfil.personajes);
+
+    // Actualizar dropdown de temas
+    actualizarDropdownTemas(perfil.temas);
+
+    console.log('Perfil seleccionado:', perfil);
+}
+
+// Función para actualizar dropdown de personajes
+function actualizarDropdownPersonajes(personajes) {
+    const select = document.getElementById('personaje');
+
+    // Limpiar opciones existentes (excepto las por defecto)
+    select.innerHTML = `
+        <option value="" disabled selected>Selecciona un personaje</option>
+        <option value="nuevo">➕ Insertar nuevo</option>
+    `;
+
+    // Agregar personajes del perfil
+    personajes.forEach(personaje => {
+        if (personaje.trim()) {
+            const option = document.createElement('option');
+            option.value = personaje.trim();
+            option.textContent = personaje.trim();
+            select.insertBefore(option, select.lastElementChild);
+        }
+    });
+}
+
+// Función para actualizar dropdown de temas
+function actualizarDropdownTemas(temas) {
+    const select = document.getElementById('tema');
+
+    // Limpiar opciones existentes (excepto las por defecto)
+    select.innerHTML = `
+        <option value="" disabled selected>Selecciona un tema</option>
+        <option value="nuevo">➕ Insertar nuevo</option>
+    `;
+
+    // Agregar temas del perfil
+    temas.forEach(tema => {
+        if (tema.trim()) {
+            const option = document.createElement('option');
+            option.value = tema.trim();
+            option.textContent = tema.trim();
+            select.insertBefore(option, select.lastElementChild);
+        }
+    });
+}
+
+// Manejar cambios en los dropdowns
+document.getElementById('personaje').addEventListener('change', function() {
+    const nuevoPersonajeInput = document.getElementById('nuevo_personaje');
+    if (this.value === 'nuevo') {
+        nuevoPersonajeInput.classList.remove('hidden');
+        nuevoPersonajeInput.required = true;
+        nuevoPersonajeInput.focus();
+    } else {
+        nuevoPersonajeInput.classList.add('hidden');
+        nuevoPersonajeInput.required = false;
+        nuevoPersonajeInput.value = '';
+    }
+});
+
+document.getElementById('tema').addEventListener('change', function() {
+    const nuevoTemaInput = document.getElementById('nuevo_tema');
+    if (this.value === 'nuevo') {
+        nuevoTemaInput.classList.remove('hidden');
+        nuevoTemaInput.required = true;
+        nuevoTemaInput.focus();
+    } else {
+        nuevoTemaInput.classList.add('hidden');
+        nuevoTemaInput.required = false;
+        nuevoTemaInput.value = '';
+    }
+});
+
+// Función para limpiar formulario
+function limpiarFormulario() {
+    // Limpiar selección de perfil
+    document.querySelectorAll('.profile-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+
+    // Limpiar formulario
+    document.getElementById('storyForm').reset();
+    document.getElementById('perfil_id').value = '';
+
+    // Ocultar campos de nuevo personaje/tema
+    document.getElementById('nuevo_personaje').classList.add('hidden');
+    document.getElementById('nuevo_tema').classList.add('hidden');
+
+    // Resetear dropdowns a estado inicial
+    document.getElementById('personaje').innerHTML = `
+        <option value="" disabled selected>Selecciona un personaje</option>
+        <option value="nuevo">➕ Insertar nuevo</option>
+    `;
+
+    document.getElementById('tema').innerHTML = `
+        <option value="" disabled selected>Selecciona un tema</option>
+        <option value="nuevo">➕ Insertar nuevo</option>
+    `;
+}
+
+// Validación del formulario antes de enviar
+document.getElementById('storyForm').addEventListener('submit', function(e) {
+    const personaje = document.getElementById('personaje').value;
+    const nuevoPersonaje = document.getElementById('nuevo_personaje').value;
+    const tema = document.getElementById('tema').value;
+    const nuevoTema = document.getElementById('nuevo_tema').value;
+
+    // Validar personaje
+    if (personaje === 'nuevo' && !nuevoPersonaje.trim()) {
+        e.preventDefault();
+        alert('Por favor ingresa un nuevo personaje');
+        document.getElementById('nuevo_personaje').focus();
+        return;
+    }
+
+    // Validar tema
+    if (tema === 'nuevo' && !nuevoTema.trim()) {
+        e.preventDefault();
+        alert('Por favor ingresa un nuevo tema');
+        document.getElementById('nuevo_tema').focus();
+        return;
+    }
+});
+
+// Inicializar página
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Página de generar cuento cargada');
+    console.log('Perfiles disponibles:', perfilesData);
+});
+</script>
+{% endblock %}

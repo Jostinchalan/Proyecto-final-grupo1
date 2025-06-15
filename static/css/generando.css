@@ -1,0 +1,550 @@
+/*static/css/generando.css*/
+/* ===================================
+   GENERANDO CUENTO STYLES - FUTURISTIC DESIGN
+   =================================== */
+
+.generando-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 200px);
+  padding: 2rem;
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Fondo animado */
+.generando-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 80%, rgba(120, 58, 237, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
+  animation: backgroundShift 10s ease-in-out infinite;
+}
+
+@keyframes backgroundShift {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Animación central futurista */
+.generando-animation {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin-bottom: 3rem;
+  z-index: 2;
+}
+
+.ai-core {
+  width: 100%;
+  height: 100%;
+  border: 3px solid transparent;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #7c3aed, #8b5cf6, #a78bfa) border-box;
+  background-clip: padding-box, border-box;
+  animation: coreRotation 4s linear infinite;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-core::before {
+  content: "";
+  position: absolute;
+  width: 80%;
+  height: 80%;
+  border: 2px solid rgba(167, 139, 250, 0.5);
+  border-radius: 50%;
+  animation: innerPulse 2s ease-in-out infinite;
+}
+
+.ai-core::after {
+  content: "";
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: energyPulse 3s ease-in-out infinite;
+}
+
+.ai-brain {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+  border-radius: 50%;
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.ai-brain::before {
+  content: "";
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(45deg, #a78bfa, #c4b5fd);
+  border-radius: 50%;
+  animation: brainPulse 1.5s ease-in-out infinite;
+}
+
+/* Partículas flotantes */
+.floating-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: linear-gradient(45deg, #7c3aed, #8b5cf6);
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+}
+
+.particle:nth-child(1) {
+  top: 10%;
+  left: 20%;
+  animation-delay: 0s;
+}
+.particle:nth-child(2) {
+  top: 20%;
+  right: 15%;
+  animation-delay: 1s;
+}
+.particle:nth-child(3) {
+  bottom: 30%;
+  left: 10%;
+  animation-delay: 2s;
+}
+.particle:nth-child(4) {
+  bottom: 20%;
+  right: 25%;
+  animation-delay: 3s;
+}
+.particle:nth-child(5) {
+  top: 50%;
+  left: 5%;
+  animation-delay: 4s;
+}
+.particle:nth-child(6) {
+  top: 60%;
+  right: 10%;
+  animation-delay: 5s;
+}
+
+/* Header futurista */
+.generando-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  max-width: 700px;
+  z-index: 2;
+  position: relative;
+}
+
+.generando-title {
+  font-size: 3.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #c4b5fd 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 30px rgba(124, 58, 237, 0.3);
+  animation: titleGlow 3s ease-in-out infinite;
+}
+
+.generando-subtitle {
+  font-size: 1.3rem;
+  color: #e0e7ff;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+/* Panel de detalles futurista */
+.cuento-details-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+  max-width: 600px;
+  width: 100%;
+  z-index: 2;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.details-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  color: #ffffff;
+}
+
+.details-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.details-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.detail-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.detail-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(124, 58, 237, 0.5);
+  transform: translateY(-2px);
+}
+
+.detail-label {
+  font-size: 0.9rem;
+  color: #a78bfa;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-value {
+  font-size: 1.1rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Panel de progreso */
+.progress-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+  max-width: 600px;
+  width: 100%;
+  z-index: 2;
+  position: relative;
+}
+
+.progress-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  color: #ffffff;
+}
+
+.progress-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.step.completed {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.step.active {
+  background: rgba(124, 58, 237, 0.1);
+  border-color: rgba(124, 58, 237, 0.5);
+  transform: scale(1.02);
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.2);
+}
+
+.step.pending {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.step-indicator {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  position: relative;
+}
+
+.step.completed .step-indicator {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.step.active .step-indicator {
+  background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+  color: white;
+  animation: activeStep 2s ease-in-out infinite;
+}
+
+.step.pending .step-indicator {
+  background: rgba(255, 255, 255, 0.1);
+  color: #9ca3af;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.step-content {
+  flex: 1;
+  color: #ffffff;
+}
+
+.step-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.step-description {
+  font-size: 0.9rem;
+  color: #a78bfa;
+  opacity: 0.8;
+}
+
+/* Indicador de tiempo */
+.time-indicator {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  z-index: 2;
+  position: relative;
+}
+
+.time-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.time-content {
+  color: #ffffff;
+}
+
+.time-label {
+  font-size: 0.9rem;
+  color: #fbbf24;
+  margin-bottom: 0.25rem;
+}
+
+.time-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Estado del sistema */
+.system-status {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  z-index: 2;
+  position: relative;
+}
+
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+  animation: statusPulse 2s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+}
+
+.status-text {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Animaciones */
+@keyframes coreRotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes innerPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes energyPulse {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes brainPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translateY(-20px) translateX(10px);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-10px) translateX(-5px);
+    opacity: 0.7;
+  }
+  75% {
+    transform: translateY(-30px) translateX(15px);
+    opacity: 0.9;
+  }
+}
+
+@keyframes titleGlow {
+  0%,
+  100% {
+    text-shadow: 0 0 30px rgba(124, 58, 237, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 40px rgba(124, 58, 237, 0.6), 0 0 60px rgba(139, 92, 246, 0.3);
+  }
+}
+
+@keyframes activeStep {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(124, 58, 237, 0.6), 0 0 40px rgba(139, 92, 246, 0.3);
+  }
+}
+
+@keyframes statusPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.2);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .generando-title {
+    font-size: 2.5rem;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .generando-animation {
+    width: 150px;
+    height: 150px;
+  }
+
+  .ai-brain {
+    width: 60px;
+    height: 60px;
+  }
+
+  .ai-brain::before {
+    width: 30px;
+    height: 30px;
+  }
+}

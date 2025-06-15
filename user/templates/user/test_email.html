@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>🧪 Probar Configuración de Email</h3>
+                </div>
+                <div class="card-body">
+                    <p>Esta página es solo para probar la configuración de email en desarrollo.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">
+                            📧 Probar Envío de Email
+                        </button>
+                    </form>
+                    
+                    <div class="mt-3">
+                        <h5>Configuración actual:</h5>
+                        <ul>
+                            <li><strong>Host:</strong> {{ settings.EMAIL_HOST }}</li>
+                            <li><strong>Puerto:</strong> {{ settings.EMAIL_PORT }}</li>
+                            <li><strong>Usuario:</strong> {{ settings.EMAIL_HOST_USER }}</li>
+                            <li><strong>TLS:</strong> {{ settings.EMAIL_USE_TLS }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

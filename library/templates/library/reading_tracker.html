@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Seguimiento Lector - CuentIA{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/library/reading_tracker.css' %}">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+<div class="tracker-container">
+    <!-- Encabezado morado estilo biblioteca -->
+    <div class="page-title-banner">
+        <h1>SEGUIMIENTO DEL LECTOR</h1>
+    </div>
+
+    <!-- Selección de período -->
+    <div class="period-selector">
+        <button class="period-btn active" data-period="week">Última Semana</button>
+        <button class="period-btn" data-period="month">Último Mes</button>
+        <button class="period-btn" data-period="year">Último Año</button>
+    </div>
+
+    <!-- Sección de perfiles con diseño igual a Generar Cuento -->
+    <div class="profiles-section-container">
+        <div class="profiles-section-box">
+            <h2>Selecciona un perfil</h2>
+            <div class="profiles-horizontal">
+                <!-- PERFIL "TODOS" PRIMERO -->
+                <div class="profile-circle selected" data-profile-id="all" onclick="selectProfile('all')">
+                    <div class="profile-avatar-circle all-profiles">
+                        <span style="font-size: 24px;">👨‍👩‍👧‍👦</span>
+                    </div>
+                    <div class="profile-name-age">
+                        <span class="profile-name">TODOS</span>
+                        <span class="profile-age">General</span>
+                    </div>
+                </div>
+
+                <!-- PERFILES INDIVIDUALES DESPUÉS -->
+                {% for profile in profiles %}
+                    <div class="profile-circle" data-profile-id="{{ profile.id }}" onclick="selectProfile('{{ profile.id }}')">
+                        <div class="profile-avatar-circle">
+                            {% if profile.foto_perfil %}
+                                <img src="{{ profile.foto_perfil.url }}" alt="{{ profile.nombre }}" class="profile-photo">
+                            {% else %}
+                                <!-- Avatar SVG basado en género si no hay foto -->
+                                {% if profile.genero == 'M' %}
+                                    <svg width="50" height="50" viewBox="0 0 100 100" fill="none">
+                                        <circle cx="50" cy="40" r="15" fill="#FDBCB4"/>
+                                        <path d="M35 25 C35 15, 65 15, 65 25 L65 35 C65 45, 35 45, 35 35 Z" fill="#8B4513"/>
+                                        <circle cx="45" cy="38" r="2" fill="#000"/>
+                                        <circle cx="55" cy="38" r="2" fill="#000"/>
+                                        <path d="M45 45 Q50 50 55 45" stroke="#000" stroke-width="1.5" fill="none"/>
+                                        <rect x="40" y="55" width="20" height="25" rx="10" fill="#4F46E5"/>
+                                    </svg>
+                                {% elif profile.genero == 'F' %}
+                                    <svg width="50" height="50" viewBox="0 0 100 100" fill="none">
+                                        <circle cx="50" cy="40" r="15" fill="#FDBCB4"/>
+                                        <path d="M30 25 C30 10, 70 10, 70 25 L70 40 C70 50, 30 50, 30 40 Z" fill="#8B4513"/>
+                                        <circle cx="25" cy="30" r="8" fill="#8B4513"/>
+                                        <circle cx="75" cy="30" r="8" fill="#8B4513"/>
+                                        <circle cx="45" cy="38" r="2" fill="#000"/>
+                                        <circle cx="55" cy="38" r="2" fill="#000"/>
+                                        <path d="M45 45 Q50 50 55 45" stroke="#000" stroke-width="1.5" fill="none"/>
+                                        <rect x="40" y="55" width="20" height="25" rx="10" fill="#EC4899"/>
+                                    </svg>
+                                {% else %}
+                                    <svg width="50" height="50" viewBox="0 0 100 100" fill="none">
+                                        <circle cx="50" cy="40" r="15" fill="#FDBCB4"/>
+                                        <path d="M35 25 C35 15, 65 15, 65 25 L65 35 C65 45, 35 45, 35 35 Z" fill="#8B4513"/>
+                                        <circle cx="45" cy="38" r="2" fill="#000"/>
+                                        <circle cx="55" cy="38" r="2" fill="#000"/>
+                                        <path d="M45 45 Q50 50 55 45" stroke="#000" stroke-width="1.5" fill="none"/>
+                                        <rect x="40" y="55" width="20" height="25" rx="10" fill="#10B981"/>
+                                    </svg>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="profile-name-age">
+                            <span class="profile-name">{{ profile.nombre|upper|truncatechars:8 }}</span>
+                            <span class="profile-age">{{ profile.edad }} años</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Estadísticas principales -->
+    <div class="main-stats">
+        <div class="stat-card">
+            <div class="stat-icon">📚</div>
+            <div class="stat-content">
+                <h3 id="total-stories">{{ total_stories }}</h3>
+                <p>Total de Cuentos</p>
+                <span class="stat-change positive" id="stories-change">+0.0% vs período anterior</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">⏱️</div>
+            <div class="stat-content">
+                <h3 id="reading-time">{{ reading_time }}</h3>
+                <p>Tiempo de Lectura</p>
+                <span class="stat-change positive" id="time-change">+0.0% vs período anterior</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">📖</div>
+            <div class="stat-content">
+                <h3 id="stories-per-week">{{ stories_per_week }}</h3>
+                <p>Cuentos por Semana</p>
+                <span class="stat-change neutral" id="weekly-change">Promedio semanal</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-content">
+                <h3 id="favorite-theme">{{ favorite_theme }}</h3>
+                <p>Tema Favorito</p>
+                <span class="stat-change neutral" id="theme-count">{{ themes_explored }} temas diferentes</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficas -->
+    <div class="charts-section">
+        <!-- Gráfica de actividad de lectura -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3>Actividad de Lectura</h3>
+                <p>Cuentos leídos por día</p>
+            </div>
+            <div id="reading-activity-chart"></div>
+        </div>
+
+        <!-- Gráfica de distribución por temas -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3>Distribución por Temas</h3>
+                <p>Preferencias de lectura</p>
+            </div>
+            <div id="themes-distribution-chart"></div>
+        </div>
+
+        <!-- Gráfica de progreso semanal -->
+        <div class="chart-container full-width">
+            <div class="chart-header">
+                <h3>Progreso de Lectura</h3>
+                <p>Evolución del tiempo de lectura</p>
+            </div>
+            <div id="reading-progress-chart"></div>
+        </div>
+    </div>
+
+    <!-- Exportar reporte -->
+    <div class="export-section">
+        <button class="export-btn" onclick="exportReport()">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+            </svg>
+            Exportar Reporte Completo
+        </button>
+    </div>
+
+    <!-- Añadir token CSRF para las solicitudes AJAX -->
+    {% csrf_token %}
+</div>
+
+<script src="{% static 'js/library/reading_tracker.js' %}"></script>
+{% endblock %}
