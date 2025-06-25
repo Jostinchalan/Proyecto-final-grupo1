@@ -119,9 +119,6 @@ LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
-
-
-
 # ===== CONFIGURACIÓN DE EMAIL MEJORADA =====
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
