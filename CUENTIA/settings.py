@@ -119,8 +119,7 @@ LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
-# API
-OPENAI_API_KEY ='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'
+
 
 
 # ===== CONFIGURACIÓN DE EMAIL MEJORADA =====
