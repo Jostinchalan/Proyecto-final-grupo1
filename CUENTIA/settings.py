@@ -139,8 +139,6 @@ EMAIL_SSL_KEYFILE = None
 SITE_NAME = 'CuentIA'
 SITE_URL = 'http://localhost:8000'
 
-# OpenAI Configuration - CAMBIA AQUÍ TU API KEY
-#aqui va la calve de la API
 # ===== LOGGING MEJORADO =====
 LOGGING = {
     'version': 1,
