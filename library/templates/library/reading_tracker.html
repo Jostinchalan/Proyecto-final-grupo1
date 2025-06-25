@@ -83,7 +83,6 @@
                     </div>
                 {% endfor %}
             </div>
-
         </div>
     </div>
 
@@ -92,7 +91,7 @@
         <div class="stat-card">
             <div class="stat-icon">📚</div>
             <div class="stat-content">
-                <h3 id="total-stories">{{ total_stories }}</h3>
+                <h3 id="total-stories">{{ total_stories|default:0 }}</h3>
                 <p>Total de Cuentos</p>
                 <span class="stat-change positive" id="stories-change">+0.0% vs período anterior</span>
             </div>
@@ -101,7 +100,7 @@
         <div class="stat-card">
             <div class="stat-icon">⏱️</div>
             <div class="stat-content">
-                <h3 id="reading-time">{{ reading_time }}</h3>
+                <h3 id="reading-time">{{ reading_time|default:"0s" }}</h3>
                 <p>Tiempo de Lectura</p>
                 <span class="stat-change positive" id="time-change">+0.0% vs período anterior</span>
             </div>
@@ -110,7 +109,7 @@
         <div class="stat-card">
             <div class="stat-icon">📖</div>
             <div class="stat-content">
-                <h3 id="stories-per-week">{{ stories_per_week }}</h3>
+                <h3 id="stories-per-week">{{ stories_per_week|default:0 }}</h3>
                 <p>Cuentos por Semana</p>
                 <span class="stat-change neutral" id="weekly-change">Promedio semanal</span>
             </div>
@@ -119,9 +118,9 @@
         <div class="stat-card">
             <div class="stat-icon">🎯</div>
             <div class="stat-content">
-                <h3 id="favorite-theme">{{ favorite_theme }}</h3>
+                <h3 id="favorite-theme">{{ favorite_theme|default:"Sin datos" }}</h3>
                 <p>Tema Favorito</p>
-                <span class="stat-change neutral" id="theme-count">{{ themes_explored }} temas diferentes</span>
+                <span class="stat-change neutral" id="theme-count">{{ themes_explored|default:0 }} temas diferentes</span>
             </div>
         </div>
     </div>
@@ -158,15 +157,15 @@
 
     <!-- Exportar reporte -->
     <div class="export-section">
-        <button class="export-btn" onclick="exportReport()">
+        <button class="export-btn" onclick="exportReport()" id="export-button">
             <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
             </svg>
-            Exportar Reporte Completo
+            <span id="export-text">Exportar Reporte Completo</span>
         </button>
     </div>
 
-    <!-- Añadir token CSRF para las solicitudes AJAX -->
+    <!-- Token CSRF para las solicitudes AJAX -->
     {% csrf_token %}
 </div>
 

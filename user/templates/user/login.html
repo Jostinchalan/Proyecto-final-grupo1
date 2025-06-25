@@ -3,7 +3,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Iniciar sesión - CuentIA</title>
     <link rel="stylesheet" href="{% static 'css/styles_landing.css' %}" />
     <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
@@ -12,7 +12,12 @@
 <body>
     <div class="auth-container">
         <div class="auth-image">
-            <img src="{% static 'images/login.jpg' %}" alt="Ilustración" />
+            <div class="auth-image-content">
+
+                <!-- Imagen principal más grande -->
+                <img src="{% static 'images/login4.png' %}" alt="Ilustración de lectura" class="auth-main-image" />
+
+            </div>
         </div>
         <div class="auth-content">
             <div class="auth-logo">
@@ -72,3 +77,6 @@
     </div>
 </body>
 </html>
+
+
+

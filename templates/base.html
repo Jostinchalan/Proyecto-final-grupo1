@@ -531,7 +531,7 @@
             font-size: 0.875rem;
         }
 
-        /* Chart card */
+        /* Chart card - MEJORADO */
         .chart-card {
             background-color: var(--card-bg) !important;
             border: 1px solid var(--border-color) !important;
@@ -547,11 +547,15 @@
             text-align: center;
         }
 
+        /* MEJORADO: Gráfico que crece hacia arriba */
         .chart {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
             height: 150px;
+            padding: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+            position: relative;
         }
 
         .chart-bar {
@@ -560,18 +564,79 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: flex-end;
             gap: 0.5rem;
+            position: relative;
         }
 
         .chart-bar-value {
             width: 100%;
-            background-color: var(--highlight-color);
-            border-radius: 0.25rem 0.25rem 0 0;
+            background: linear-gradient(135deg, var(--highlight-color), #a855f7);
+            border-radius: 0.375rem 0.375rem 0 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            min-height: 4px; /* Altura mínima visible */
+            box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+        }
+
+        .chart-bar-value:hover {
+            background: linear-gradient(135deg, #7c3aed, #9333ea);
+            transform: scaleY(1.05);
+            box-shadow: 0 4px 8px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Mostrar valor al hacer hover */
+        .chart-bar-value::after {
+            content: attr(data-value);
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .chart-bar-value:hover::after {
+            opacity: 1;
         }
 
         .chart-bar-label {
             color: var(--text-secondary) !important;
             font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        /* Líneas de referencia del gráfico */
+        .chart::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 25%;
+            height: 1px;
+            background: var(--border-color);
+            opacity: 0.3;
+        }
+
+        .chart::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: var(--border-color);
+            opacity: 0.3;
         }
 
         /* Welcome message */
@@ -792,7 +857,7 @@
                     </div>
                 </div>
                 <div class="user-card-content">
-                    <h3>BUENOS DÍAS {{ request.user.username|upper }}</h3>
+                    <h3>BIENVENIDO {{ request.user.username|upper }}</h3>
                     <p>DISFRUTA LA NARRACIÓN DE CUENTOS PERSONALIZADOS</p>
                 </div>
             </div>
@@ -839,30 +904,42 @@
                 </div>
             </div>
 
-            <!-- Gráfico de actividad -->
+            <!-- MEJORADO: Gráfico de actividad con barras que crecen hacia arriba -->
             <div class="chart-card">
                 <h3>ACTIVIDAD MENSUAL</h3>
                 <div class="chart">
+                    {% for semana in actividad_mensual %}
                     <div class="chart-bar">
-                        <div class="chart-bar-value" style="height: 30%;"></div>
+                        <div class="chart-bar-value" 
+                             style="height: {% if semana.porcentaje > 0 %}{{ semana.porcentaje }}%{% else %}3%{% endif %};"
+                             data-value="{{ semana.cuentos }}"
+                             title="{{ semana.cuentos }} cuento{{ semana.cuentos|pluralize }} ({{ semana.inicio }} - {{ semana.fin }}){% if semana.tiempo_minutos > 0 %} - {{ semana.tiempo_minutos }} min de lectura{% endif %}">
+                        </div>
+                        <div class="chart-bar-label">{{ semana.semana }}</div>
+                    </div>
+                    {% empty %}
+                    <!-- Fallback si no hay datos -->
+                    <div class="chart-bar">
+                        <div class="chart-bar-value" style="height: 3%;" data-value="0" title="0 cuentos"></div>
                         <div class="chart-bar-label">S1</div>
                     </div>
                     <div class="chart-bar">
-                        <div class="chart-bar-value" style="height: 45%;"></div>
+                        <div class="chart-bar-value" style="height: 3%;" data-value="0" title="0 cuentos"></div>
                         <div class="chart-bar-label">S2</div>
                     </div>
                     <div class="chart-bar">
-                        <div class="chart-bar-value" style="height: 60%;"></div>
+                        <div class="chart-bar-value" style="height: 3%;" data-value="0" title="0 cuentos"></div>
                         <div class="chart-bar-label">S3</div>
                     </div>
                     <div class="chart-bar">
-                        <div class="chart-bar-value" style="height: 75%;"></div>
+                        <div class="chart-bar-value" style="height: 3%;" data-value="0" title="0 cuentos"></div>
                         <div class="chart-bar-label">S4</div>
                     </div>
                     <div class="chart-bar">
-                        <div class="chart-bar-value" style="height: 90%;"></div>
+                        <div class="chart-bar-value" style="height: 3%;" data-value="0" title="0 cuentos"></div>
                         <div class="chart-bar-label">S5</div>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>

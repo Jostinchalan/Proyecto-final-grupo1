@@ -27,6 +27,7 @@ urlpatterns = [
     # NUEVAS RUTAS AJAX PARA FILTROS DINÁMICOS
     path('ajax/themes-by-profile/', views.get_themes_by_profile, name='themes_by_profile'),
     path('ajax/search-titles/', views.search_titles_ajax, name='search_titles'),
+
 ]
 
 # Debug: Imprimir las URLs de library cargadas

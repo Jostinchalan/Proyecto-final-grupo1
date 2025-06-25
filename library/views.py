@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.utils import timezone
@@ -13,9 +13,9 @@ import logging
 # Import models
 from stories.models import Cuento, EstadisticaLectura
 from user.models import Perfil
-from .models import LibraryManager
+from .models import LibraryManager, CuentoEliminado
 
-# Import utilities
+# Import utilities with error handling
 try:
     from stories.utils import generar_pdf_cuento
 except ImportError:
@@ -32,6 +32,162 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
+@login_required
+def export_reading_report(request):
+    """Vista para exportar reporte de lectura - CORREGIDA PARA MANEJAR ERRORES"""
+    try:
+        print(f"🔄 === EXPORT_READING_REPORT ===")
+        print(f"👤 Usuario: {request.user.username}")
+        print(f"📊 Parámetros GET: {dict(request.GET)}")
+
+        # Verificar que la función de generación esté disponible
+        if not generate_library_report:
+            logger.error("generate_library_report function not available")
+            messages.error(request, 'Funcionalidad de exportación no disponible temporalmente.')
+            return redirect('library:reading_tracker')
+
+        # Obtener parámetros con valores por defecto seguros
+        profile_id = request.GET.get('profile_id', 'all')
+        period = request.GET.get('period', 'month')
+        format_type = request.GET.get('format', 'pdf')
+
+        print(f"🔧 Parámetros procesados:")
+        print(f"  - Profile ID: {profile_id}")
+        print(f"  - Period: {period}")
+        print(f"  - Format: {format_type}")
+
+        # Validar período
+        valid_periods = ['week', 'month', 'year', 'all_time']
+        if period not in valid_periods:
+            logger.warning(f"Invalid period: {period}")
+            period = 'month'
+
+        # Obtener perfil si se especifica
+        perfil = None
+        if profile_id and profile_id != 'all':
+            try:
+                perfil = get_object_or_404(Perfil, id=profile_id, usuario=request.user)
+                print(f"👤 Perfil encontrado: {perfil.nombre}")
+            except Exception as e:
+                logger.error(f"Error getting profile {profile_id}: {e}")
+                print(f"❌ Error obteniendo perfil: {e}")
+                perfil = None
+
+        # Generar reporte según formato
+        if format_type == 'pdf':
+            try:
+                print(f"📄 Generando PDF...")
+
+                # Generar PDF con manejo de errores robusto
+                pdf_data = generate_library_report(request.user, perfil, period, 'pdf')
+
+                # Verificar que el PDF no esté vacío
+                if not pdf_data or len(pdf_data) == 0:
+                    raise Exception("El PDF generado está vacío")
+
+                # Verificar que sea realmente un PDF
+                if not pdf_data.startswith(b'%PDF'):
+                    raise Exception("Los datos generados no son un PDF válido")
+
+                print(f"✅ PDF generado exitosamente: {len(pdf_data)} bytes")
+
+                # Crear respuesta HTTP
+                response = HttpResponse(pdf_data, content_type='application/pdf')
+
+                # Generar nombre de archivo
+                profile_name = perfil.nombre if perfil else 'General'
+                safe_profile_name = profile_name.replace(' ', '_').replace('/', '_')
+                filename = f"CuentIA_Reporte_{period}_{safe_profile_name}_{timezone.now().strftime('%Y%m%d')}.pdf"
+
+                response['Content-Disposition'] = f'attachment; filename="{filename}"'
+                response['Content-Length'] = len(pdf_data)
+
+                logger.info(f"✅ PDF report exported successfully for {request.user.username}")
+                print(f"✅ ÉXITO: Reporte PDF exportado")
+                return response
+
+            except Exception as e:
+                logger.error(f"❌ Error generating PDF: {str(e)}")
+                print(f"❌ ERROR PDF: {str(e)}")
+
+                # Intentar generar un PDF de error
+                try:
+                    from reportlab.platypus import SimpleDocTemplate, Paragraph
+                    from reportlab.lib.styles import getSampleStyleSheet
+                    from reportlab.lib.pagesizes import letter
+                    from io import BytesIO
+
+                    error_buffer = BytesIO()
+                    doc = SimpleDocTemplate(error_buffer, pagesize=letter)
+                    styles = getSampleStyleSheet()
+
+                    story = [
+                        Paragraph("Error al Generar Reporte", styles['Title']),
+                        Paragraph(f"Se produjo un error: {str(e)}", styles['Normal']),
+                        Paragraph("Por favor, intenta nuevamente o contacta al soporte técnico.", styles['Normal']),
+                        Paragraph(f"Usuario: {request.user.username}", styles['Normal']),
+                        Paragraph(f"Período: {period}", styles['Normal']),
+                        Paragraph(f"Perfil: {perfil.nombre if perfil else 'General'}", styles['Normal']),
+                        Paragraph(f"Fecha: {timezone.now().strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal'])
+                    ]
+
+                    doc.build(story)
+                    error_buffer.seek(0)
+                    error_pdf = error_buffer.getvalue()
+
+                    response = HttpResponse(error_pdf, content_type='application/pdf')
+                    response['Content-Disposition'] = 'attachment; filename="CuentIA_Error_Report.pdf"'
+                    return response
+
+                except Exception as pdf_error:
+                    logger.error(f"❌ Error creating error PDF: {pdf_error}")
+                    messages.error(request, f'Error al generar el reporte: {str(e)}')
+                    return redirect('library:reading_tracker')
+
+        elif format_type == 'json':
+            try:
+                print(f"📊 Generando JSON...")
+
+                # Generar JSON
+                json_data = generate_library_report(request.user, perfil, period, 'json')
+
+                response = JsonResponse(json_data, safe=False)
+                response['Content-Disposition'] = 'attachment; filename="reading_report.json"'
+
+                logger.info(f"✅ JSON report exported successfully for {request.user.username}")
+                print(f"✅ ÉXITO: Reporte JSON exportado")
+                return response
+
+            except Exception as e:
+                logger.error(f"❌ Error generating JSON: {str(e)}")
+                print(f"❌ ERROR JSON: {str(e)}")
+                return JsonResponse({
+                    'error': True,
+                    'message': f'Error al generar reporte JSON: {str(e)}'
+                }, status=500)
+
+        else:
+            logger.error(f"Unsupported format: {format_type}")
+            messages.error(request, f'Formato no soportado: {format_type}')
+            return redirect('library:reading_tracker')
+
+    except Exception as e:
+        logger.error(f"❌ Critical error in export_reading_report: {str(e)}")
+        print(f"❌ ERROR CRÍTICO: {str(e)}")
+
+        # Respuesta de error para AJAX
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'error': True,
+                'message': f'Error crítico al exportar reporte: {str(e)}'
+            }, status=500)
+
+        # Respuesta de error para navegador
+        messages.error(request, f'Error al exportar el reporte: {str(e)}')
+        return redirect('library:reading_tracker')
+
+
+# Mantener todas las demás vistas existentes...
 @login_required
 def library_view(request):
     """Main library view - CORREGIDA PARA MANTENER FILTROS"""
@@ -78,7 +234,7 @@ def library_view(request):
             cuentos = cuentos.filter(titulo__icontains=filtros_actuales['titulo'])
             print(f"Filtrado por título: {filtros_actuales['titulo']}")
 
-        # Ordenar
+        # Ordenar y filtrar
         ordenar_por = filtros_actuales.get('ordenar_por', 'fecha')
         if ordenar_por == 'fecha':
             cuentos = cuentos.order_by('-fecha_creacion')
@@ -94,6 +250,10 @@ def library_view(request):
         elif ordenar_por == 'año':
             fecha_limite = timezone.now() - timedelta(days=365)
             cuentos = cuentos.filter(fecha_creacion__gte=fecha_limite).order_by('-fecha_creacion')
+        elif ordenar_por == 'favoritos':
+            # CORREGIDO: Filtrar solo cuentos marcados como favoritos
+            cuentos = cuentos.filter(es_favorito=True).order_by('-fecha_creacion')
+            print(f"🌟 Filtrando solo favoritos: {cuentos.count()} cuentos encontrados")
         else:
             cuentos = cuentos.order_by('-fecha_creacion')
 
@@ -120,7 +280,8 @@ def library_view(request):
         # Migración automática si es necesario
         total_cuentos_usuario = Cuento.objects.filter(usuario=request.user).count()
         cuentos_completados = Cuento.objects.filter(usuario=request.user, estado='completado').count()
-        cuentos_en_biblioteca = Cuento.objects.filter(usuario=request.user, estado='completado', en_biblioteca=True).count()
+        cuentos_en_biblioteca = Cuento.objects.filter(usuario=request.user, estado='completado',
+                                                      en_biblioteca=True).count()
 
         if cuentos_completados > 0 and cuentos_en_biblioteca == 0:
             print("🔄 Migrando cuentos existentes a biblioteca...")
@@ -162,40 +323,6 @@ def library_view(request):
         logger.error(f"Error in library_view: {str(e)}")
         messages.error(request, 'Error al cargar la biblioteca.')
         return redirect('dashboard')
-
-@login_required
-def view_library_story(request, story_id):
-    """View to see a story from library"""
-    try:
-        story = get_object_or_404(
-            Cuento,
-            id=story_id,
-            usuario=request.user,
-            estado='completado',
-            en_biblioteca=True  # Solo cuentos en biblioteca
-        )
-
-        # Mark as read if the method exists
-        if hasattr(story, 'marcar_como_leido'):
-            story.marcar_como_leido()
-
-        # Register reading statistic from library with profile
-        EstadisticaLectura.objects.create(
-            usuario=request.user,
-            cuento=story,
-            perfil=story.perfil,
-            tipo_lectura='biblioteca'
-        )
-
-        logger.info(f"Story viewed from library: {story.titulo} by {request.user.username}")
-
-        # Redirect to existing generated story view
-        return redirect('stories:generated_story', cuento_id=story.id)
-
-    except Exception as e:
-        logger.error(f"Error viewing story from library: {str(e)}")
-        messages.error(request, 'Error al cargar el cuento.')
-        return redirect('library:library')
 
 
 @login_required
@@ -445,7 +572,6 @@ def get_profile_stats(request, profile_id=None):
             print(f"🕐 Hora actual local: {ahora_local}")
 
             for i in range(min(days_range, 30)):
-                # Calcular fecha restando días
                 fecha_objetivo = hoy_local - timedelta(days=i)
                 print(f"📅 Procesando fecha: {fecha_objetivo}")
 
@@ -548,6 +674,44 @@ def get_profile_stats(request, profile_id=None):
             'total_reading_time': '0s',
             'favorite_theme': 'Error'
         }, status=500)
+
+
+# Resto de vistas existentes sin cambios...
+@login_required
+def view_library_story(request, story_id):
+    """View to see a story from library"""
+    try:
+        story = get_object_or_404(
+            Cuento,
+            id=story_id,
+            usuario=request.user,
+            estado='completado',
+            en_biblioteca=True  # Solo cuentos en biblioteca
+        )
+
+        # Mark as read if the method exists
+        if hasattr(story, 'marcar_como_leido'):
+            story.marcar_como_leido()
+
+        # Register reading statistic from library with profile
+        EstadisticaLectura.objects.create(
+            usuario=request.user,
+            cuento=story,
+            perfil=story.perfil,
+            tipo_lectura='biblioteca'
+        )
+
+        logger.info(f"Story viewed from library: {story.titulo} by {request.user.username}")
+
+        # Redirect to existing generated story view
+        return redirect('stories:generated_story', cuento_id=story.id)
+
+    except Exception as e:
+        logger.error(f"Error viewing story from library: {str(e)}")
+        messages.error(request, 'Error al cargar el cuento.')
+        return redirect('library:library')
+
+
 @login_required
 def update_reading_time(request):
     """API para actualizar tiempo de lectura (AJAX) - MEJORADA"""
@@ -639,7 +803,7 @@ def update_reading_time(request):
         }, status=500)
 
 
-# Resto de las vistas existentes...
+# Resto de las vistas existentes sin cambios...
 @login_required
 def debug_library_view(request):
     """Debug view to test if routing works"""
@@ -649,7 +813,7 @@ def debug_library_view(request):
 @login_required
 @require_POST
 def delete_story(request, story_id):
-    """View to delete a story from library"""
+    """View to delete a story from library - ACTUALIZADA CON AUDITORÍA"""
     try:
         story = get_object_or_404(
             Cuento,
@@ -659,13 +823,37 @@ def delete_story(request, story_id):
         )
         title = story.titulo
 
+        print(f"🗑️ ELIMINANDO DESDE LIBRARY: {story.titulo} (ID: {story.id})")
+
+        # NUEVO: Registrar en auditoría ANTES de eliminar
+        try:
+            cuento_eliminado = LibraryManager.registrar_cuento_eliminado(
+                cuento=story,
+                usuario=request.user,
+                request=request,
+                motivo='usuario'
+            )
+
+            if cuento_eliminado:
+                logger.info(f"✅ Cuento registrado en auditoría: {story.titulo} (ID: {story.id})")
+                print(f"✅ AUDITORÍA: Cuento '{story.titulo}' registrado correctamente")
+            else:
+                logger.warning(f"⚠️ No se pudo registrar en auditoría: {story.titulo} (ID: {story.id})")
+                print(f"⚠️ AUDITORÍA: Error registrando '{story.titulo}'")
+
+        except Exception as audit_error:
+            logger.error(f"❌ Error en auditoría para cuento {story.id}: {audit_error}")
+            print(f"❌ AUDITORÍA: Error - {audit_error}")
+            # Continuar con la eliminación aunque falle la auditoría
+
         # Also delete related statistics
         EstadisticaLectura.objects.filter(cuento=story).delete()
 
         # Delete the story
         story.delete()
 
-        logger.info(f"Story deleted from library: {title} by {request.user.username}")
+        logger.info(f"🗑️ Cuento eliminado: {title} (ID: {story_id}) por usuario {request.user.username}")
+        print(f"🗑️ ELIMINACIÓN: '{title}' eliminado correctamente")
 
         return JsonResponse({
             'success': True,
@@ -873,56 +1061,7 @@ def toggle_library_favorite(request, story_id):
         })
 
 
-@login_required
-def export_reading_report(request):
-    """Vista para exportar reporte de lectura"""
-    try:
-        if not generate_library_report:
-            messages.info(request, 'Funcionalidad de exportación en desarrollo.')
-            return redirect('library:reading_tracker')
-
-        profile_id = request.GET.get('profile_id')
-        period = request.GET.get('period', 'month')
-        format_type = request.GET.get('format', 'pdf')
-
-        if profile_id and profile_id != 'all':
-            perfil = get_object_or_404(Perfil, id=profile_id, usuario=request.user)
-        else:
-            perfil = None
-
-        if format_type == 'pdf':
-            # Generate PDF
-            pdf_data = generate_library_report(request.user, perfil, period, 'pdf')
-
-            # Create HTTP response
-            response = HttpResponse(pdf_data, content_type='application/pdf')
-            filename = f"CuentIA_Reporte_Lectura_{timezone.now().strftime('%Y%m%d')}.pdf"
-            response['Content-Disposition'] = f'attachment; filename="{filename}"'
-
-            logger.info(f"Reading report exported as PDF for {request.user.username}")
-            return response
-
-        elif format_type == 'json':
-            # Generate JSON
-            json_data = generate_library_report(request.user, perfil, period, 'json')
-
-            response = JsonResponse(json_data)
-            response['Content-Disposition'] = 'attachment; filename="reading_report.json"'
-
-            logger.info(f"Reading report exported as JSON for {request.user.username}")
-            return response
-
-        else:
-            messages.error(request, f'Formato no soportado: {format_type}')
-            return redirect('library:reading_tracker')
-
-    except Exception as e:
-        logger.error(f"Error exporting reading report: {str(e)}")
-        messages.error(request, 'Error al exportar el reporte.')
-        return redirect('library:reading_tracker')
-
-
-#filtros de busqueda
+# filtros de busqueda
 @login_required
 def get_themes_by_profile(request):
     """AJAX view to get themes filtered by profile - MEJORADA"""
@@ -1002,3 +1141,166 @@ def search_titles_ajax(request):
             'titles': [],
             'error': str(e)
         })
+
+
+@login_required
+@require_http_methods(["POST"])
+def eliminar_cuento_con_auditoria(request, cuento_id):
+    """Vista para eliminar cuento y registrar en auditoría"""
+    try:
+        from stories.models import Cuento
+
+        # Obtener el cuento
+        cuento = get_object_or_404(Cuento, id=cuento_id, usuario=request.user)
+
+        # Registrar en auditoría ANTES de eliminar
+        cuento_eliminado = LibraryManager.registrar_cuento_eliminado(
+            cuento=cuento,
+            usuario=request.user,
+            request=request,
+            motivo='usuario'
+        )
+
+        if cuento_eliminado:
+            logger.info(f"✅ Cuento registrado en auditoría: {cuento.titulo}")
+        else:
+            logger.warning(f"⚠️ No se pudo registrar en auditoría: {cuento.titulo}")
+
+        # Eliminar el cuento
+        titulo_eliminado = cuento.titulo
+        cuento.delete()
+
+        logger.info(f"🗑️ Cuento eliminado: {titulo_eliminado} (ID: {cuento_id}) por usuario {request.user.username}")
+
+        return JsonResponse({
+            'success': True,
+            'message': f'Cuento "{titulo_eliminado}" eliminado correctamente',
+            'cuento_id': cuento_id
+        })
+
+    except Cuento.DoesNotExist:
+        logger.warning(f"⚠️ Intento de eliminar cuento inexistente: {cuento_id}")
+        return JsonResponse({
+            'success': False,
+            'error': 'Cuento no encontrado'
+        }, status=404)
+
+    except Exception as e:
+        logger.error(f"❌ Error eliminando cuento {cuento_id}: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': f'Error al eliminar cuento: {str(e)}'
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def estadisticas_cuentos_eliminados(request):
+    """Vista para obtener estadísticas de cuentos eliminados"""
+    try:
+        # Parámetros
+        time_period = request.GET.get('period', 'month')
+        profile_id = request.GET.get('profile_id')
+
+        # Obtener rango de fechas
+        from .utils import get_time_range_ecuador
+        start_date, end_date = get_time_range_ecuador(time_period)
+
+        # Filtros base
+        queryset = CuentoEliminado.objects.filter(usuario=request.user)
+
+        if start_date:
+            queryset = queryset.filter(fecha_eliminacion__gte=start_date)
+
+        if profile_id and profile_id != 'all':
+            queryset = queryset.filter(perfil_id=profile_id)
+
+        # Obtener estadísticas
+        cuentos_eliminados = queryset.order_by('-fecha_eliminacion')
+
+        # Preparar datos para respuesta
+        eliminados_data = []
+        for cuento in cuentos_eliminados[:10]:  # Máximo 10 para el reporte
+            eliminados_data.append({
+                'titulo': cuento.titulo,
+                'fecha_eliminacion': cuento.fecha_eliminacion.strftime('%d de %B de %Y'),
+                'personaje': cuento.personaje_principal or 'Sin personaje',
+                'tema': cuento.tema_display,
+                'perfil': cuento.perfil.nombre if cuento.perfil else 'Sin perfil'
+            })
+
+        return JsonResponse({
+            'success': True,
+            'total_eliminados': cuentos_eliminados.count(),
+            'cuentos_eliminados': eliminados_data
+        })
+
+    except Exception as e:
+        logger.error(f"❌ Error obteniendo estadísticas de eliminados: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def eliminar_cuento(request, cuento_id):
+    """Vista ACTUALIZADA para eliminar cuento con sistema de auditoría"""
+    try:
+        from .models import Cuento
+
+        # Obtener el cuento
+        cuento = get_object_or_404(Cuento, id=cuento_id, usuario=request.user)
+
+        print(f"🗑️ ELIMINANDO: {cuento.titulo} (ID: {cuento.id})")
+
+        # NUEVO: Registrar en auditoría ANTES de eliminar
+        try:
+            from library.models import LibraryManager
+
+            cuento_eliminado = LibraryManager.registrar_cuento_eliminado(
+                cuento=cuento,
+                usuario=request.user,
+                request=request,
+                motivo='usuario'
+            )
+
+            if cuento_eliminado:
+                logger.info(f"✅ Cuento registrado en auditoría: {cuento.titulo} (ID: {cuento.id})")
+                print(f"✅ AUDITORÍA: Cuento '{cuento.titulo}' registrado correctamente")
+            else:
+                logger.warning(f"⚠️ No se pudo registrar en auditoría: {cuento.titulo} (ID: {cuento.id})")
+                print(f"⚠️ AUDITORÍA: Error registrando '{cuento.titulo}'")
+
+        except Exception as audit_error:
+            logger.error(f"❌ Error en auditoría para cuento {cuento.id}: {audit_error}")
+            print(f"❌ AUDITORÍA: Error - {audit_error}")
+            # Continuar con la eliminación aunque falle la auditoría
+
+        # Eliminar el cuento
+        titulo_eliminado = cuento.titulo
+        cuento.delete()
+
+        logger.info(f"🗑️ Cuento eliminado: {titulo_eliminado} (ID: {cuento_id}) por usuario {request.user.username}")
+        print(f"🗑️ ELIMINACIÓN: '{titulo_eliminado}' eliminado correctamente")
+
+        return JsonResponse({
+            'success': True,
+            'message': f'Cuento "{titulo_eliminado}" eliminado correctamente',
+            'cuento_id': cuento_id
+        })
+
+    except Cuento.DoesNotExist:
+        logger.warning(f"⚠️ Intento de eliminar cuento inexistente: {cuento_id}")
+        return JsonResponse({
+            'success': False,
+            'error': 'Cuento no encontrado'
+        }, status=404)
+
+    except Exception as e:
+        logger.error(f"❌ Error eliminando cuento {cuento_id}: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': f'Error al eliminar cuento: {str(e)}'
+        }, status=500)

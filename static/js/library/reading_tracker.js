@@ -1,4 +1,4 @@
-let selectedProfileId = "all" // CAMBIO: Inicializar con "all" por defecto
+let selectedProfileId = "all" // Inicializar con "all" por defecto
 let currentPeriod = "week"
 let chartsData = {}
 const d3 = window.d3
@@ -19,7 +19,7 @@ function initializeTracker() {
     })
   })
 
-  // CAMBIO: Seleccionar perfil "Todos" por defecto
+  // Seleccionar perfil "Todos" por defecto
   selectProfile("all")
 }
 
@@ -44,7 +44,7 @@ function selectProfile(profileId) {
 }
 
 function loadInitialData() {
-  // CAMBIO: Cargar datos iniciales con perfil "all" seleccionado
+  // Cargar datos iniciales con perfil "all" seleccionado
   loadChartData("all")
 }
 
@@ -65,11 +65,11 @@ function loadChartData(profileId = selectedProfileId) {
   console.log(`📡 URL: ${url}`)
 
   fetch(url, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'X-Requested-With': 'XMLHttpRequest',
-      'Content-Type': 'application/json'
-    }
+      "X-Requested-With": "XMLHttpRequest",
+      "Content-Type": "application/json",
+    },
   })
     .then((response) => {
       console.log(`📡 Status: ${response.status}`)
@@ -100,30 +100,11 @@ function loadChartData(profileId = selectedProfileId) {
     })
 }
 
-// FUNCIÓN PARA PROBAR MANUALMENTE
-function testAPI() {
-  console.log("🧪 PROBANDO API...")
-  fetch('/library/reading-tracker/stats/?period=week')
-    .then(r => r.json())
-    .then(data => {
-      console.log("✅ API funciona:", data)
-      if (data.total_stories > 0) {
-        console.log("🎉 ¡HAY DATOS! Las estadísticas deberían funcionar")
-      }
-    })
-    .catch(e => console.error("❌ API no funciona:", e))
-}
-
-// Ejecutar prueba al cargar la página
-document.addEventListener("DOMContentLoaded", () => {
-  setTimeout(testAPI, 1000)
-})
-
 // FUNCIÓN MEJORADA PARA MOSTRAR ESTADÍSTICAS
 function updateStats() {
   console.log("📊 Actualizando estadísticas con datos:", chartsData)
 
-  // Actualizar estadísticas principales
+  // Actualizar estadísticas principales con validación
   const totalStoriesEl = document.getElementById("total-stories")
   const readingTimeEl = document.getElementById("reading-time")
   const storiesPerWeekEl = document.getElementById("stories-per-week")
@@ -239,7 +220,8 @@ function createThemesDistributionChart() {
   container.selectAll("*").remove()
 
   if (!chartsData.theme_distribution || chartsData.theme_distribution.length === 0) {
-    container.append("div")
+    container
+      .append("div")
       .attr("class", "no-data")
       .style("display", "flex")
       .style("align-items", "center")
@@ -279,7 +261,7 @@ function createThemesDistributionChart() {
     .attr("fill", (d) => color(d.data.theme))
     .style("cursor", "pointer")
     .on("mouseover", (event, d) => {
-      showTooltip(event, `${d.data.theme}: ${d.data.count} cuento${d.data.count !== 1 ? 's' : ''}`)
+      showTooltip(event, `${d.data.theme}: ${d.data.count} cuento${d.data.count !== 1 ? "s" : ""}`)
     })
     .on("mouseout", hideTooltip)
 
@@ -288,7 +270,6 @@ function createThemesDistributionChart() {
     .append("text")
     .attr("transform", (d) => {
       const centroid = arc.centroid(d)
-      // Mover las etiquetas un poco hacia afuera
       centroid[0] *= 1.4
       centroid[1] *= 1.4
       return `translate(${centroid})`
@@ -405,19 +386,109 @@ function hideTooltip() {
   d3.selectAll(".tooltip").remove()
 }
 
+// FUNCIÓN COMPLETAMENTE CORREGIDA PARA EXPORTAR REPORTES
 function exportReport() {
-  // Obtener formato y período
-  const format = "pdf" // Por defecto PDF
-  const profileParam = selectedProfileId ? `&profile_id=${selectedProfileId}` : ""
-
-  // URL para exportar
+  const format = "pdf"
+  const profileParam = selectedProfileId && selectedProfileId !== "all" ? `&profile_id=${selectedProfileId}` : ""
   const url = `/library/reading-tracker/export/?format=${format}&period=${currentPeriod}${profileParam}`
 
-  // Mostrar notificación
-  showNotification("Generando reporte completo...", "info")
+  console.log("🔗 URL de exportación:", url)
+  console.log("📊 Datos actuales:", { selectedProfileId, currentPeriod })
 
-  // Abrir en nueva ventana
-  window.open(url, "_blank")
+  // Deshabilitar botón y mostrar estado de carga
+  const exportButton = document.getElementById("export-button")
+  const exportText = document.getElementById("export-text")
+
+  if (exportButton) {
+    exportButton.disabled = true
+    exportButton.style.opacity = "0.6"
+  }
+  if (exportText) {
+    exportText.textContent = "Generando PDF..."
+  }
+
+  // Mostrar notificación
+  showNotification("Generando reporte PDF...", "info")
+
+  // Usar fetch para mejor control de errores
+  fetch(url, {
+    method: "GET",
+    headers: {
+      "X-Requested-With": "XMLHttpRequest",
+    },
+  })
+    .then((response) => {
+      console.log("📡 Response status:", response.status)
+      console.log("📡 Response headers:", Object.fromEntries(response.headers.entries()))
+
+      if (!response.ok) {
+        return response.text().then((text) => {
+          throw new Error(`HTTP ${response.status}: ${text}`)
+        })
+      }
+
+      // Verificar que es realmente un PDF
+      const contentType = response.headers.get("content-type")
+      if (!contentType || !contentType.includes("application/pdf")) {
+        throw new Error(`Tipo de contenido inválido: ${contentType}`)
+      }
+
+      return response.blob()
+    })
+    .then((blob) => {
+      console.log("📄 PDF blob recibido:", blob.size, "bytes")
+
+      if (blob.size === 0) {
+        throw new Error("El archivo PDF está vacío")
+      }
+
+      // Verificar que el blob es realmente un PDF
+      return blob.arrayBuffer().then((buffer) => {
+        const uint8Array = new Uint8Array(buffer)
+        const header = String.fromCharCode.apply(null, uint8Array.slice(0, 4))
+
+        if (header !== "%PDF") {
+          throw new Error("El archivo descargado no es un PDF válido")
+        }
+
+        return blob
+      })
+    })
+    .then((blob) => {
+      // Crear URL del blob y descargar
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+
+      // Nombre del archivo
+      const profileName = selectedProfileId === "all" ? "General" : `Perfil_${selectedProfileId}`
+      const filename = `CuentIA_Reporte_${currentPeriod}_${profileName}_${new Date().toISOString().split("T")[0]}.pdf`
+      link.download = filename
+
+      // Descargar
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      // Limpiar URL del blob
+      window.URL.revokeObjectURL(url)
+
+      showNotification("¡Reporte descargado exitosamente!", "success")
+    })
+    .catch((error) => {
+      console.error("❌ Error exportando reporte:", error)
+      showNotification(`Error: ${error.message}`, "error")
+    })
+    .finally(() => {
+      // Rehabilitar botón
+      if (exportButton) {
+        exportButton.disabled = false
+        exportButton.style.opacity = "1"
+      }
+      if (exportText) {
+        exportText.textContent = "Exportar Reporte Completo"
+      }
+    })
 }
 
 function showLoading(show) {
@@ -444,6 +515,10 @@ function showLoading(show) {
 }
 
 function showNotification(message, type = "info") {
+  // Remover notificaciones existentes
+  const existingNotifications = document.querySelectorAll(".notification")
+  existingNotifications.forEach((n) => n.remove())
+
   const notification = document.createElement("div")
   notification.className = `notification notification-${type}`
   notification.innerHTML = `
@@ -467,7 +542,8 @@ function showNotification(message, type = "info") {
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 border-left: 4px solid #7e22ce;
                 animation: slideInRight 0.3s ease;
-                max-width: 300px;
+                max-width: 350px;
+                min-width: 250px;
             }
             .notification-success { border-left-color: #10b981; }
             .notification-error { border-left-color: #ef4444; }
@@ -482,6 +558,7 @@ function showNotification(message, type = "info") {
                 color: #374151;
                 font-size: 14px;
                 font-weight: 500;
+                flex: 1;
             }
             .notification-close {
                 background: none;
@@ -490,6 +567,15 @@ function showNotification(message, type = "info") {
                 font-size: 18px;
                 cursor: pointer;
                 margin-left: 10px;
+                padding: 0;
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .notification-close:hover {
+                color: #374151;
             }
             @keyframes slideInRight {
                 from { transform: translateX(100%); opacity: 0; }
@@ -501,11 +587,14 @@ function showNotification(message, type = "info") {
 
   document.body.appendChild(notification)
 
-  setTimeout(() => {
-    if (notification.parentElement) {
-      notification.remove()
-    }
-  }, 5000)
+  // Auto-remover después de 5 segundos (excepto errores)
+  if (type !== "error") {
+    setTimeout(() => {
+      if (notification.parentElement) {
+        notification.remove()
+      }
+    }, 5000)
+  }
 }
 
 // Detener temporizador al abandonar la página
@@ -515,5 +604,6 @@ window.addEventListener("beforeunload", () => {
   }
 })
 
-// Hacer las funciones globales para que puedan ser llamadas desde otros scripts
+// Hacer las funciones globales
 window.selectProfile = selectProfile
+window.exportReport = exportReport
