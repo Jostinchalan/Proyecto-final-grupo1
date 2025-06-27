@@ -192,10 +192,8 @@ def login_view(request):
         if form.is_valid():
             login(request, form.get_user())
             send_login_notification(form.get_user(), request)
-            messages.success(request, f'Bienvenido, {form.get_user().username}!')
+
             return redirect('user:loading')
-        else:
-            messages.error(request, 'Por favor corrige los errores en el formulario')
     else:
         form = LoginForm()
 

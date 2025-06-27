@@ -17,31 +17,31 @@
     <div class="generando-details">
         <div class="detail-item">
             <span class="detail-label">
-                👤 Personaje:
+                Personaje:
             </span>
             <span class="detail-value">{{ datos_formulario.personaje_principal }}</span>
         </div>
         <div class="detail-item">
             <span class="detail-label">
-                🎭 Tema:
+                 Tema:
             </span>
             <span class="detail-value">{{ datos_formulario.tema|title }}</span>
         </div>
         <div class="detail-item">
             <span class="detail-label">
-                🎂 Edad:
+                 Edad:
             </span>
             <span class="detail-value">{{ datos_formulario.edad }}</span>
         </div>
         <div class="detail-item">
             <span class="detail-label">
-                📏 Longitud:
+                 Longitud:
             </span>
             <span class="detail-value">{{ datos_formulario.longitud|title }}</span>
         </div>
         <div class="detail-item">
             <span class="detail-label">
-                📊 Estado:
+                 Estado:
             </span>
             <span class="detail-value status-indicator status-{{ cuento.estado }}" id="estado-actual">
                 {{ cuento.estado|title }}
@@ -58,21 +58,21 @@
             </div>
         </div>
         <div class="step active" id="step-generating">
-            <div class="step-icon">🤖</div>
+            <div class="step-icon"></div>
             <div>
                 <div class="step-text">Generando historia con IA</div>
                 <div class="step-description">Creando el contenido del cuento</div>
             </div>
         </div>
         <div class="step pending" id="step-image">
-            <div class="step-icon">🎨</div>
+            <div class="step-icon"></div>
             <div>
                 <div class="step-text">Creando ilustración mágica</div>
                 <div class="step-description">Generando imagen personalizada</div>
             </div>
         </div>
         <div class="step pending" id="step-final">
-            <div class="step-icon">📚</div>
+            <div class="step-icon"></div>
             <div>
                 <div class="step-text">Finalizando cuento</div>
                 <div class="step-description">Preparando la presentación</div>
@@ -81,12 +81,12 @@
     </div>
 
     <div class="estimated-time">
-        ⏱️ Tiempo estimado: 30-60 segundos
+         Tiempo estimado: 30-60 segundos
     </div>
 
     <!-- Debug Info -->
     <div class="debug-info">
-        <h4>🔍 Información de Debug:</h4>
+        <h4> Información de Debug:</h4>
         <div>ID del Cuento: {{ cuento.id }}</div>
         <div>Usuario: {{ cuento.usuario.username }}</div>
         <div>Estado Actual: <span id="debug-estado">{{ cuento.estado }}</span></div>
@@ -367,7 +367,7 @@
 let currentStep = 1;
 let checkInterval;
 let intentosVerificacion = 0;
-const maxIntentos = 60; // 5 minutos máximo
+const maxIntentos = 60;
 
 // Simular progreso de pasos
 function updateSteps() {
@@ -396,7 +396,7 @@ function checkCuentoStatus() {
     const cuentoId = {{ cuento.id }};
     intentosVerificacion++;
 
-    console.log(`🔍 Verificación #${intentosVerificacion} del cuento ${cuentoId}`);
+    console.log(` Verificación #${intentosVerificacion} del cuento ${cuentoId}`);
 
     // Actualizar UI
     document.getElementById('intentos-verificacion').textContent = intentosVerificacion;
@@ -404,7 +404,7 @@ function checkCuentoStatus() {
 
     // Verificar límite de intentos
     if (intentosVerificacion > maxIntentos) {
-        console.error('❌ Tiempo límite excedido');
+        console.error(' Tiempo límite excedido');
         clearInterval(checkInterval);
         alert('El proceso está tomando más tiempo del esperado. Serás redirigido para intentar de nuevo.');
         window.location.href = '/stories/generar/';
@@ -418,11 +418,11 @@ function checkCuentoStatus() {
         }
     })
     .then(response => {
-        console.log(`📡 Response status: ${response.status}`);
+        console.log(` Response status: ${response.status}`);
         return response.json();
     })
     .then(data => {
-        console.log('📊 Response data:', data);
+        console.log(' Response data:', data);
 
         // Actualizar estado en UI
         document.getElementById('debug-estado').textContent = data.estado;
@@ -430,7 +430,7 @@ function checkCuentoStatus() {
         document.getElementById('estado-actual').className = `detail-value status-indicator status-${data.estado}`;
 
         if (data.completado) {
-            console.log('✅ Cuento completado, redirigiendo...');
+            console.log(' Cuento completado, redirigiendo...');
 
             // Completar todos los pasos
             const steps = document.querySelectorAll('.step');
@@ -449,21 +449,21 @@ function checkCuentoStatus() {
             }, 1000);
 
         } else if (data.error) {
-            console.error('❌ Error en la generación');
+            console.error('Error en la generación');
             clearInterval(checkInterval);
             alert('Hubo un error generando el cuento. Serás redirigido para intentar de nuevo.');
             window.location.href = '/stories/generar/';
         }
     })
     .catch(error => {
-        console.error('❌ Error checking status:', error);
+        console.error(' Error checking status:', error);
         // No detener el proceso por errores de red, seguir intentando
     });
 }
 
 // Inicializar verificaciones
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Página de generación cargada');
+    console.log(' Página de generación cargada');
 
     // Actualizar pasos cada 8 segundos
     setInterval(updateSteps, 8000);

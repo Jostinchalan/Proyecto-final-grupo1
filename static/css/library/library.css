@@ -4,7 +4,7 @@
 :root {
   --biblioteca-bg: #f8fafc;
   --biblioteca-card-bg: #ffffff;
-  --biblioteca-text-primary: #1e293b;
+  --biblioteca-text-primary: #1a1a1a;
   --biblioteca-text-secondary: #64748b;
   --biblioteca-border: #e2e8f0;
   --biblioteca-purple: #8B5CF6;
@@ -16,10 +16,10 @@
 [data-theme="dark"],
 .dark-mode {
   --biblioteca-bg: #1a1a1a;
-  --biblioteca-card-bg: #1e293b;
+  --biblioteca-card-bg: #1a1a1a;
   --biblioteca-text-primary: #f1f5f9;
   --biblioteca-text-secondary: #94a3b8;
-  --biblioteca-border: #334155;
+  --biblioteca-border: #3351ea;
   --biblioteca-purple: #a855f7;
   --biblioteca-purple-hover: #3351ea;
   --biblioteca-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
@@ -42,7 +42,7 @@
   align-items: center !important;
   margin-bottom: 2rem;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--biblioteca-purple), var(--biblioteca-purple-hover));
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
   border-radius: 1rem;
   color: white;
   box-shadow: var(--biblioteca-shadow);

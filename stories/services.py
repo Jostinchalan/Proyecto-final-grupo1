@@ -16,10 +16,8 @@ class OpenAIService:
 
         if self.api_key:
             try:
-                # Asegúrate de que la clave API comienza con "sk-" (formato correcto)
                 if not self.api_key.startswith('sk-'):
                     logger.warning("OPENAI_API_KEY no tiene el formato correcto (debe comenzar con 'sk-')")
-
                 self.client = OpenAI(api_key=self.api_key)
                 logger.info("Cliente OpenAI inicializado correctamente")
             except Exception as e:
@@ -28,22 +26,14 @@ class OpenAIService:
             logger.warning("OPENAI_API_KEY no configurada - usando modo fallback")
 
     def generar_cuento_completo(self, datos_formulario: Dict, user=None) -> Tuple[str, str, str, str, str]:
-        """
-        Genera un cuento completo con título, contenido, moraleja e imagen
-        NUEVA FUNCIONALIDAD: Ahora considera el idioma del usuario
-        """
         try:
-            # NUEVA FUNCIONALIDAD - Obtener idioma del usuario
             idioma = self._obtener_idioma_usuario(user)
-            logger.info(f"🌍 Generando cuento en idioma: {idioma} para usuario: {user.username if user else 'Anónimo'}")
-
+            logger.info(f" Generando cuento en idioma: {idioma} para usuario: {user.username if user else 'Anónimo'}")
             logger.info(f"Iniciando generacion de cuento para: {datos_formulario.get('personaje_principal', 'N/A')}")
 
             if not self.client:
                 logger.info("Cliente OpenAI no disponible, usando fallback")
                 return self._generar_cuento_fallback(datos_formulario, idioma)
-
-            # 1. Intentar generar el cuento con IA
             logger.info("Intentando generar texto del cuento con IA...")
             try:
                 titulo, contenido, moraleja = self._generar_texto_cuento(datos_formulario, idioma)
@@ -52,7 +42,6 @@ class OpenAIService:
                 logger.warning(f"Error con IA, usando fallback para texto: {str(e)}")
                 titulo, contenido, moraleja = self._generar_cuento_fallback(datos_formulario, idioma)[:3]
 
-            # 2. Intentar generar la imagen
             logger.info("Intentando generar imagen del cuento...")
             try:
                 imagen_url, imagen_prompt = self._generar_imagen_cuento(titulo, contenido, datos_formulario['tema'],
@@ -63,26 +52,21 @@ class OpenAIService:
                 imagen_url = "/static/images/cuento-placeholder.png"
                 imagen_prompt = "Imagen placeholder para el cuento"
 
-            logger.info(f"✅ Cuento generado exitosamente en {idioma}: {titulo}")
+            logger.info(f" Cuento generado exitosamente en {idioma}: {titulo}")
             return titulo, contenido, moraleja, imagen_url, imagen_prompt
 
         except Exception as e:
             logger.error(f"Error generando cuento completo: {str(e)}")
-            # Fallback con contenido de ejemplo
             idioma = self._obtener_idioma_usuario(user)
             return self._generar_cuento_fallback(datos_formulario, idioma)
 
     def _generar_texto_cuento(self, datos: Dict, idioma: str = 'es') -> Tuple[str, str, str]:
-        """Genera el texto del cuento usando GPT en el idioma especificado"""
         if not self.client:
             raise Exception("Cliente OpenAI no disponible")
-
         prompt = self._construir_prompt_cuento(datos, idioma)
-
-        logger.info(f"📝 Enviando prompt a OpenAI en idioma: {idioma}")
-
+        logger.info(f" Enviando prompt a OpenAI en idioma: {idioma}")
         response = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=[
                 {
                     "role": "system",
@@ -93,48 +77,38 @@ class OpenAIService:
                     "content": prompt
                 }
             ],
-            max_tokens=1500,
+            max_tokens=2000,
             temperature=0.8,
-            presence_penalty=0.1,
+            presence_penalty=0.2,
             frequency_penalty=0.1
         )
 
         contenido_completo = response.choices[0].message.content.strip()
-        logger.info(f"📄 Respuesta recibida de OpenAI: {len(contenido_completo)} caracteres")
-
-        # Procesar la respuesta para extraer título, contenido y moraleja
+        logger.info(f" Respuesta recibida de OpenAI: {len(contenido_completo)} caracteres")
         titulo, contenido, moraleja = self._procesar_respuesta_cuento(contenido_completo, datos, idioma)
-
         return titulo, contenido, moraleja
 
     def _generar_imagen_cuento(self, titulo: str, contenido: str, tema: str, idioma: str = 'es') -> Tuple[str, str]:
-        """Genera una imagen para el cuento usando DALL-E"""
         if not self.client:
             raise Exception("Cliente OpenAI no disponible")
-
         prompt_imagen = self._construir_prompt_imagen(titulo, contenido, tema, idioma)
-
-        logger.info("🎨 Generando imagen con DALL-E...")
-
+        logger.info(" Generando imagen con DALL-E...")
         response = self.client.images.generate(
             model="dall-e-3",
             prompt=prompt_imagen,
             size="1024x1024",
-            quality="standard",
+            quality="hd",
+            style="vivid",
             n=1,
         )
 
         imagen_url = response.data[0].url
 
-        logger.info("🖼️ Imagen generada exitosamente")
+        logger.info("Imagen generada exitosamente")
         return imagen_url, prompt_imagen
 
     def _construir_prompt_cuento(self, datos: Dict, idioma: str = 'es') -> str:
-        """Construye el prompt optimizado para generar el cuento en el idioma especificado"""
-
         logger.info(f"🔧 Construyendo prompt en idioma: {idioma}")
-
-        # NUEVA FUNCIONALIDAD - Descripciones por idioma
         edad_descripciones = {
             'es': {
                 '3-5': 'niños de 3 a 5 años (preescolar) - usa vocabulario muy simple, frases cortas y conceptos básicos',
@@ -219,7 +193,6 @@ class OpenAIService:
                 'animales': 'animaux domestiques, animaux sauvages, communication animale'
             }
         }
-
         edad_descripcion = edad_descripciones.get(idioma, edad_descripciones['es']).get(datos.get('edad', '6-8'),
                                                                                         edad_descripciones['es']['6-8'])
         longitud_descripcion = longitud_descripciones.get(idioma, longitud_descripciones['es']).get(
@@ -230,7 +203,6 @@ class OpenAIService:
         titulo_sugerido = datos.get('titulo', '').strip()
         personaje = datos.get('personaje_principal', 'un niño aventurero')
 
-        # NUEVA FUNCIONALIDAD - Prompts por idioma
         prompts_por_idioma = {
             'es': f"""
 Escribe {longitud_descripcion} para {edad_descripcion} con las siguientes características:
@@ -351,14 +323,12 @@ IMPORTANT: Assure-toi que l'histoire soit passionnante, éducative, magique et c
         }
 
         prompt_final = prompts_por_idioma.get(idioma, prompts_por_idioma['es'])
-        logger.info(f"📝 Prompt construido para idioma {idioma}, longitud: {len(prompt_final)} caracteres")
+        logger.info(f" Prompt construido para idioma {idioma}, longitud: {len(prompt_final)} caracteres")
 
         return prompt_final
 
     def _construir_prompt_imagen(self, titulo: str, contenido: str, tema: str, idioma: str = 'es') -> str:
-        """Construye el prompt para generar la imagen del cuento"""
 
-        # Extraer elementos clave del contenido para la imagen
         tema_visual = {
             'aventura': 'adventure scene with maps, treasure, mountains, brave characters',
             'fantasia': 'magical fantasy scene with sparkles, enchanted forest, magical creatures',
@@ -392,9 +362,6 @@ The image should capture the wonder and magic of childhood stories, with beautif
 
     def _procesar_respuesta_cuento(self, respuesta: str, datos_formulario: Dict, idioma: str = 'es') -> Tuple[
         str, str, str]:
-        """Procesa la respuesta de OpenAI y extrae título, contenido y moraleja"""
-
-        # Valores por defecto por idioma
         titulos_default = {
             'es': datos_formulario.get('titulo', '').strip() or 'El Cuento Mágico',
             'en': datos_formulario.get('titulo', '').strip() or 'The Magical Tale',
@@ -414,7 +381,6 @@ The image should capture the wonder and magic of childhood stories, with beautif
         moraleja_default = moralejas_default.get(idioma, moralejas_default['es'])
 
         try:
-            # Buscar patrones en la respuesta según el idioma
             patrones_titulo = {
                 'es': ['TÍTULO:', 'TITULO:'],
                 'en': ['TITLE:', 'TÍTULO:', 'TITULO:'],
@@ -447,28 +413,20 @@ The image should capture the wonder and magic of childhood stories, with beautif
                 linea = linea.strip()
                 if not linea:
                     continue
-
-                # Buscar título
                 for patron in patrones_titulo.get(idioma, patrones_titulo['es']):
                     if linea.upper().startswith(patron):
                         titulo_extraido = linea.replace(patron, '').strip()
                         seccion_actual = "titulo"
                         break
-
-                # Buscar inicio de cuento
                 for patron in patrones_cuento.get(idioma, patrones_cuento['es']):
                     if linea.upper().startswith(patron):
                         seccion_actual = "contenido"
                         break
-
-                # Buscar moraleja
                 for patron in patrones_moraleja.get(idioma, patrones_moraleja['es']):
                     if linea.upper().startswith(patron):
                         seccion_actual = "moraleja"
                         moraleja_extraida = linea.replace(patron, '').strip()
                         break
-
-                # Agregar contenido según la sección
                 if seccion_actual == "contenido" and not any(linea.upper().startswith(p) for patrones in
                                                              [patrones_titulo.get(idioma, []),
                                                               patrones_cuento.get(idioma, []),
@@ -480,15 +438,12 @@ The image should capture the wonder and magic of childhood stories, with beautif
                     if not any(linea.upper().startswith(p) for p in patrones_moraleja.get(idioma, [])):
                         moraleja_extraida += " " + linea
 
-            # Limpiar contenido
             contenido_extraido = contenido_extraido.strip()
             moraleja_extraida = moraleja_extraida.strip()
-
-            # Si no se pudo extraer contenido, usar toda la respuesta
             if not contenido_extraido:
                 contenido_extraido = respuesta
 
-            logger.info(f"📚 Cuento procesado en {idioma} - Titulo: {titulo_extraido[:50]}...")
+            logger.info(f"Cuento procesado en {idioma} - Titulo: {titulo_extraido[:50]}...")
             return titulo_extraido, contenido_extraido, moraleja_extraida
 
         except Exception as e:
@@ -496,14 +451,11 @@ The image should capture the wonder and magic of childhood stories, with beautif
             return titulo_default, contenido_default, moraleja_default
 
     def _generar_cuento_fallback(self, datos: Dict, idioma: str = 'es') -> Tuple[str, str, str, str, str]:
-        """Genera un cuento de fallback mejorado si falla la API en el idioma especificado"""
         personaje = datos.get('personaje_principal', 'un niño aventurero')
         tema = datos.get('tema', 'aventura')
         edad = datos.get('edad', '6-8')
 
         logger.info(f"🔄 Generando cuento fallback en idioma: {idioma}")
-
-        # NUEVA FUNCIONALIDAD - Títulos personalizados por tema e idioma
         titulos_por_tema = {
             'es': {
                 'aventura': f"La Gran Aventura de {personaje}",
@@ -545,7 +497,6 @@ The image should capture the wonder and magic of childhood stories, with beautif
 
         titulo = titulos_por_tema.get(idioma, titulos_por_tema['es']).get(tema, f"La Aventura Mágica de {personaje}")
 
-        # NUEVA FUNCIONALIDAD - Contenidos personalizados por tema e idioma
         contenidos_por_tema = {
             'es': {
                 'aventura': f"""
@@ -669,8 +620,6 @@ Ensemble, {personaje} et son nouvel ami découvrirent qu'ils avaient beaucoup de
                                                                                                                  contenidos_por_tema[
                                                                                                                      'es'])[
             'aventura'])
-
-        # NUEVA FUNCIONALIDAD - Moralejas por tema e idioma
         moralejas_por_tema = {
             'es': {
                 'aventura': "Las aventuras más grandes comienzan cuando tenemos el valor de dar el primer paso y ayudar a otros en el camino.",
@@ -717,51 +666,42 @@ Ensemble, {personaje} et son nouvel ami découvrirent qu'ils avaient beaucoup de
         imagen_url = "/static/images/cuento-placeholder.png"
         imagen_prompt = f"Imagen placeholder para cuento de {tema}"
 
-        logger.info(f"📖 Cuento fallback generado en {idioma}: {titulo}")
+        logger.info(f"Cuento fallback generado en {idioma}: {titulo}")
         return titulo, contenido, moraleja, imagen_url, imagen_prompt
 
-    # CORRECCIÓN PRINCIPAL - Método mejorado para obtener idioma del usuario
     def _obtener_idioma_usuario(self, user) -> str:
-        """Obtiene el idioma configurado del usuario - VERSIÓN CORREGIDA"""
         try:
             if user and user.is_authenticated:
-                # Importar aquí para evitar importaciones circulares
                 from user.models import UserSettings
 
-                logger.info(f"🔍 Buscando configuraciones para usuario: {user.username}")
-
-                # Intentar obtener las configuraciones del usuario
+                logger.info(f"Buscando configuraciones para usuario: {user.username}")
                 try:
                     settings_obj = UserSettings.objects.get(user=user)
                     idioma = settings_obj.language
-                    logger.info(f"🌍 Idioma obtenido de UserSettings: '{idioma}' para usuario {user.username}")
-
-                    # Validar que el idioma sea uno de los soportados
+                    logger.info(f"Idioma obtenido de UserSettings: '{idioma}' para usuario {user.username}")
                     idiomas_soportados = ['es', 'en', 'de', 'fr']
                     if idioma in idiomas_soportados:
                         return idioma
                     else:
-                        logger.warning(f"⚠️ Idioma '{idioma}' no soportado, usando español por defecto")
+                        logger.warning(f"Idioma '{idioma}' no soportado, usando español por defecto")
                         return 'es'
 
                 except UserSettings.DoesNotExist:
                     logger.warning(
-                        f"⚠️ UserSettings no existe para usuario {user.username}, creando con idioma por defecto")
-                    # Crear configuraciones por defecto
+                        f"UserSettings no existe para usuario {user.username}, creando con idioma por defecto")
                     settings_obj = UserSettings.objects.create(user=user, language='es')
                     return 'es'
                 except Exception as e:
-                    logger.error(f"❌ Error obteniendo UserSettings para {user.username}: {str(e)}")
+                    logger.error(f"Error obteniendo UserSettings para {user.username}: {str(e)}")
                     return 'es'
             else:
-                logger.info("👤 Usuario no autenticado o None, usando idioma por defecto: es")
+                logger.info("Usuario no autenticado o None, usando idioma por defecto: es")
                 return 'es'
         except Exception as e:
-            logger.error(f"❌ Error general obteniendo idioma del usuario: {str(e)}")
+            logger.error(f"Error general obteniendo idioma del usuario: {str(e)}")
             return 'es'  # Idioma por defecto
 
     def _obtener_system_prompt(self, idioma: str) -> str:
-        """Obtiene el prompt del sistema según el idioma"""
         system_prompts = {
             'es': """Eres un escritor experto en cuentos infantiles mágicos. 
                     Creas historias cautivadoras, educativas y apropiadas para la edad especificada. 
@@ -783,7 +723,6 @@ Ensemble, {personaje} et son nouvel ami découvrirent qu'ils avaient beaucoup de
         return system_prompts.get(idioma, system_prompts['es'])
 
     def get_language_name(self, language_code: str) -> str:
-        """Obtiene el nombre del idioma"""
         languages = {
             'es': 'Español',
             'en': 'English',
@@ -792,6 +731,4 @@ Ensemble, {personaje} et son nouvel ami découvrirent qu'ils avaient beaucoup de
         }
         return languages.get(language_code, 'Español')
 
-
-# Instancia global del servicio
 openai_service = OpenAIService()

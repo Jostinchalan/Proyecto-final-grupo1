@@ -1,4 +1,4 @@
-/* Estilos mejorados para el seguimiento lector */
+/* Estilos mejorados para el seguimiento lector - COMPATIBLE CON MODO CLARO/OSCURO */
 .tracker-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -30,6 +30,7 @@
   white-space: nowrap;
   display: inline-block;
   max-width: 100%;
+  color: white !important;
 }
 
 .page-subtitle-container {
@@ -38,7 +39,7 @@
 }
 
 .page-subtitle {
-  color: #6b7280;
+  color: var(--text-secondary) !important;
   font-size: 1.1rem;
   margin: 0;
   font-weight: 500;
@@ -75,7 +76,7 @@
   }
 }
 
-/* Selector de período - MODO CLARO POR DEFECTO */
+/* Selector de período - USANDO VARIABLES CSS */
 .period-selector {
   display: flex;
   justify-content: center;
@@ -84,19 +85,19 @@
 }
 
 .period-btn {
-  background-color: #f3f4f6 !important;
-  border: none;
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
   padding: 12px 24px;
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.95rem;
-  color: #374151 !important;
+  color: var(--text-primary) !important;
 }
 
 .period-btn:hover {
-  background-color: #e5e7eb !important;
+  background-color: var(--hover-bg) !important;
   transform: translateY(-2px);
 }
 
@@ -104,19 +105,20 @@
   background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%) !important;
   color: white !important;
   box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  border-color: #8b5cf6 !important;
 }
 
-/* SECCIÓN DE PERFILES - MODO CLARO POR DEFECTO */
+/* SECCIÓN DE PERFILES - USANDO VARIABLES CSS */
 .profiles-section-container {
   margin-bottom: 30px;
 }
 
 .profiles-section-box {
-  background: #ffffff !important;
+  background: var(--card-bg) !important;
   border-radius: 20px;
   padding: 30px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e2e8f0 !important;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color) !important;
   position: relative;
   overflow: hidden;
   max-width: 1000px;
@@ -125,7 +127,7 @@
 
 .profiles-section-box h2 {
   font-size: 1.5rem;
-  color: #374151 !important;
+  color: var(--text-primary) !important;
   margin-bottom: 30px;
   text-align: left;
   font-weight: 600;
@@ -142,26 +144,26 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* Estilos de la barra de scroll - MODO CLARO */
+/* Estilos de la barra de scroll - USANDO VARIABLES CSS */
 .profiles-horizontal::-webkit-scrollbar {
   height: 8px;
 }
 
 .profiles-horizontal::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--hover-bg);
   border-radius: 4px;
 }
 
 .profiles-horizontal::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--border-color);
   border-radius: 4px;
 }
 
 .profiles-horizontal::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--text-secondary);
 }
 
-/* Perfil individual - MODO CLARO */
+/* Perfil individual - USANDO VARIABLES CSS */
 .profile-circle {
   display: flex;
   flex-direction: column;
@@ -228,7 +230,7 @@
   box-shadow: 0 6px 20px 0 rgba(124, 58, 237, 0.25);
 }
 
-/* Información del perfil - MODO CLARO */
+/* Información del perfil - USANDO VARIABLES CSS */
 .profile-name-age {
   text-align: center;
   display: flex;
@@ -241,7 +243,7 @@
   display: block;
   font-weight: 700;
   font-size: 0.95rem;
-  color: #1f2937 !important;
+  color: var(--text-primary) !important;
   line-height: 1.2;
   letter-spacing: 0.025em;
   text-transform: uppercase;
@@ -273,7 +275,7 @@
 /* Texto de deslizar */
 .scroll-hint {
   text-align: center;
-  color: #9ca3af !important;
+  color: var(--text-secondary) !important;
   font-size: 0.9rem;
   font-style: italic;
   margin-top: 10px;
@@ -347,7 +349,7 @@
   }
 }
 
-/* Estadísticas principales - MODO CLARO POR DEFECTO */
+/* Estadísticas principales - USANDO VARIABLES CSS */
 .main-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -373,13 +375,13 @@
 }
 
 .stat-card {
-  background: #ffffff !important;
+  background: var(--card-bg) !important;
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow);
   display: flex;
   align-items: center;
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid var(--border-color) !important;
   transition: all 0.3s ease;
   min-width: 0;
   min-height: 120px;
@@ -404,14 +406,14 @@
 
 .stat-content h3 {
   font-size: 2rem;
-  color: #111827 !important;
+  color: var(--text-primary) !important;
   margin: 0 0 8px 0;
   font-weight: 700;
   line-height: 1.1;
 }
 
 .stat-content p {
-  color: #6b7280 !important;
+  color: var(--text-secondary) !important;
   margin: 0 0 10px 0;
   font-size: 0.95rem;
   font-weight: 600;
@@ -437,7 +439,7 @@
 }
 
 .stat-change.neutral {
-  color: #6b7280;
+  color: var(--text-secondary);
   background: rgba(107, 114, 128, 0.1);
 }
 
@@ -487,7 +489,7 @@
   }
 }
 
-/* Sección de gráficas - MODO CLARO POR DEFECTO */
+/* Sección de gráficas - USANDO VARIABLES CSS */
 .charts-section {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -496,12 +498,12 @@
 }
 
 .chart-container {
-  background: #ffffff !important;
+  background: var(--card-bg) !important;
   border-radius: 16px;
   padding: 25px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow);
   position: relative;
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid var(--border-color) !important;
 }
 
 .chart-container.full-width {
@@ -514,13 +516,13 @@
 
 .chart-header h3 {
   font-size: 1.3rem;
-  color: #111827 !important;
+  color: var(--text-primary) !important;
   margin: 0 0 8px 0;
   font-weight: 700;
 }
 
 .chart-header p {
-  color: #6b7280 !important;
+  color: var(--text-secondary) !important;
   margin: 0;
   font-size: 0.95rem;
   font-weight: 500;
@@ -553,19 +555,19 @@
 
 .axis path,
 .axis line {
-  stroke: #e2e8f0;
+  stroke: var(--border-color);
 }
 
 .axis text {
-  fill: #6b7280;
+  fill: var(--text-secondary);
   font-size: 12px;
   font-weight: 500;
 }
 
 .tooltip {
   position: absolute;
-  background: #374151;
-  color: white;
+  background: var(--text-primary);
+  color: var(--bg-primary);
   padding: 10px 15px;
   border-radius: 8px;
   font-size: 13px;
@@ -573,6 +575,7 @@
   z-index: 1000;
   font-weight: 600;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
 }
 
 /* Sección de exportación */
@@ -609,25 +612,26 @@
   margin-right: 10px;
 }
 
-/* Indicador de carga */
+/* Indicador de carga - USANDO VARIABLES CSS */
 .chart-loader {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: var(--card-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 16px;
   z-index: 10;
+  opacity: 0.95;
 }
 
 .spinner {
   width: 45px;
   height: 45px;
-  border: 4px solid #e5e7eb;
+  border: 4px solid var(--border-color);
   border-top: 4px solid #7c3aed;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -647,7 +651,7 @@
   align-items: center;
   justify-content: center;
   height: 200px;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-style: italic;
   font-weight: 500;
 }
@@ -699,173 +703,318 @@
   }
 }
 
-/* MODO OSCURO - SOLO SE APLICA CUANDO EL SISTEMA ESTÁ EN MODO OSCURO */
-@media (prefers-color-scheme: dark) {
-  /* Contenedor principal */
-  .tracker-container {
-    background-color: #1f2937 !important;
-    color: #f9fafb !important;
-  }
+/* ASEGURAR QUE TODOS LOS ELEMENTOS USEN LAS VARIABLES CSS */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+}
 
-  /* Subtítulo */
-  .page-subtitle {
-    color: #9ca3af !important;
-  }
+/* Forzar el uso de variables en elementos específicos */
+.tracker-container * {
+  color: inherit;
+  background-color: inherit;
+}
 
-  /* Botones de período */
-  .period-btn {
-    background-color: #374151 !important;
-    color: #f9fafb !important;
-    border: 1px solid #4b5563 !important;
-  }
+/* Asegurar que los textos usen las variables correctas */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-primary) !important;
+}
 
-  .period-btn:hover {
-    background-color: #4b5563 !important;
-  }
+p,
+span,
+div {
+  color: var(--text-primary);
+}
 
-  .period-btn.active {
-    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%) !important;
-    color: white !important;
-    border-color: #8b5cf6 !important;
-  }
+/* Asegurar que los fondos usen las variables correctas */
+.profiles-section-box,
+.stat-card,
+.chart-container {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+}
 
-  /* SECCIÓN DE PERFILES - FONDO OSCURO COMO GENERAR CUENTO */
-  .profiles-section-box {
-    background: #374151 !important;
-    border: 1px solid #4b5563 !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
-  }
+/* Botones que deben usar las variables */
+.period-btn {
+  background: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+}
 
-  .profiles-section-box h2 {
-    color: #f9fafb !important;
-  }
+.period-btn:hover {
+  background: var(--hover-bg) !important;
+}
 
-  /* Perfiles individuales */
-  .profile-circle {
-    background: transparent !important;
-    border-color: transparent !important;
-  }
+/* Asegurar que los elementos de scroll usen las variables */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
 
-  .profile-circle:hover {
-    background: rgba(124, 58, 237, 0.15) !important;
-    border-color: rgba(124, 58, 237, 0.3) !important;
-  }
+::-webkit-scrollbar-track {
+  background: var(--hover-bg);
+}
 
-  .profile-circle.selected {
-    background: rgba(124, 58, 237, 0.2) !important;
-    border-color: #8b5cf6 !important;
-  }
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
 
-  /* Nombres y edades de perfiles */
-  .profile-name {
-    color: #f9fafb !important;
-  }
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
 
-  .profile-age {
-    color: #8b5cf6 !important;
-    background: rgba(124, 58, 237, 0.2) !important;
-    border-color: rgba(124, 58, 237, 0.4) !important;
-  }
+/* Mantener estos elementos con colores específicos */
+.page-title-banner,
+.page-title-banner * {
+  color: white !important;
+}
 
-  .profile-circle.selected .profile-name {
-    color: #a855f7 !important;
-  }
+.export-btn {
+  color: white !important;
+}
 
-  .profile-circle.selected .profile-age {
-    background: #7c3aed !important;
-    color: white !important;
-    border-color: #7c3aed !important;
-  }
+.period-btn.active {
+  color: white !important;
+}
 
-  /* Texto de scroll */
-  .scroll-hint {
-    color: #6b7280 !important;
-  }
+.profile-circle.selected .profile-age {
+  color: white !important;
+}
 
-  /* Barra de scroll */
-  .profiles-horizontal::-webkit-scrollbar-track {
-    background: #4b5563 !important;
-  }
+/* Forzar que el contenedor principal use colores claros */
+.light-theme-forced {
+  background-color: #f5f5f5 !important;
+  color: #333333 !important;
+}
 
-  .profiles-horizontal::-webkit-scrollbar-thumb {
-    background: #6b7280 !important;
-  }
+/* Forzar fondos blancos para todas las secciones */
+.light-theme-forced .profiles-section-box {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  color: #333333 !important;
+}
 
-  .profiles-horizontal::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af !important;
-  }
+.light-theme-forced .profiles-section-box h2 {
+  color: #333333 !important;
+}
 
-  /* TARJETAS DE ESTADÍSTICAS */
-  .stat-card {
-    background: #374151 !important;
-    border: 1px solid #4b5563 !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
-  }
+/* Forzar fondos blancos para las tarjetas de estadísticas */
+.light-theme-forced .stat-card {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  color: #333333 !important;
+}
 
-  .stat-card:hover {
-    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3) !important;
-  }
+.light-theme-forced .stat-content h3 {
+  color: #333333 !important;
+}
 
-  .stat-content h3 {
-    color: #f9fafb !important;
-  }
+.light-theme-forced .stat-content p {
+  color: #666666 !important;
+}
 
-  .stat-content p {
-    color: #d1d5db !important;
-  }
+/* Forzar fondos blancos para los contenedores de gráficas */
+.light-theme-forced .chart-container {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  color: #333333 !important;
+}
 
-  /* CONTENEDORES DE GRÁFICAS */
-  .chart-container {
-    background: #374151 !important;
-    border: 1px solid #4b5563 !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
-  }
+.light-theme-forced .chart-header h3 {
+  color: #333333 !important;
+}
 
-  .chart-header h3 {
-    color: #f9fafb !important;
-  }
+.light-theme-forced .chart-header p {
+  color: #666666 !important;
+}
 
-  .chart-header p {
-    color: #d1d5db !important;
-  }
+/* Forzar colores claros para los botones de período */
+.light-theme-forced .period-btn {
+  background: #ffffff !important;
+  color: #333333 !important;
+  border: 1px solid #e5e7eb !important;
+}
 
-  /* Elementos de gráficas */
-  .axis path,
-  .axis line {
-    stroke: #4b5563 !important;
-  }
+.light-theme-forced .period-btn:hover {
+  background: #f3f4f6 !important;
+}
 
-  .axis text {
-    fill: #9ca3af !important;
-  }
+.light-theme-forced .period-btn.active {
+  background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%) !important;
+  color: white !important;
+  border-color: #8b5cf6 !important;
+}
 
-  .tooltip {
-    background: #1f2937 !important;
-    border: 1px solid #4b5563 !important;
-  }
+/* Forzar colores claros para los nombres de perfiles */
+.light-theme-forced .profile-name {
+  color: #333333 !important;
+}
 
-  /* Indicador de carga */
-  .chart-loader {
-    background-color: rgba(55, 65, 81, 0.95) !important;
-  }
+/* Forzar colores claros para elementos de texto */
+.light-theme-forced h1,
+.light-theme-forced h2,
+.light-theme-forced h3,
+.light-theme-forced h4,
+.light-theme-forced h5,
+.light-theme-forced h6 {
+  color: #333333 !important;
+}
 
-  .spinner {
-    border-color: #4b5563 !important;
-    border-top-color: #7c3aed !important;
-  }
+.light-theme-forced p,
+.light-theme-forced span,
+.light-theme-forced div {
+  color: #333333 !important;
+}
 
-  .no-data {
-    color: #9ca3af !important;
-  }
+/* Elementos específicos que necesitan colores secundarios */
+.light-theme-forced .page-subtitle,
+.light-theme-forced .chart-header p,
+.light-theme-forced .stat-content p,
+.light-theme-forced .scroll-hint {
+  color: #666666 !important;
+}
 
-  /* Botón de exportar */
-  .export-btn {
-    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%) !important;
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4) !important;
-  }
+/* Forzar colores claros para elementos de gráficas */
+.light-theme-forced .axis text {
+  fill: #666666 !important;
+}
 
-  .export-btn:hover {
-    background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%) !important;
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5) !important;
-  }
+.light-theme-forced .axis path,
+.light-theme-forced .axis line {
+  stroke: #e5e7eb !important;
+}
+
+.light-theme-forced .tooltip {
+  background: #333333 !important;
+  color: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.light-theme-forced .no-data {
+  color: #666666 !important;
+}
+
+/* Indicador de carga */
+.light-theme-forced .chart-loader {
+  background-color: #ffffff !important;
+}
+
+.light-theme-forced .spinner {
+  border-color: #e5e7eb !important;
+  border-top-color: #7c3aed !important;
+}
+
+/* Barras de scroll */
+.light-theme-forced .profiles-horizontal::-webkit-scrollbar-track {
+  background: #f3f4f6 !important;
+}
+
+.light-theme-forced .profiles-horizontal::-webkit-scrollbar-thumb {
+  background: #e5e7eb !important;
+}
+
+.light-theme-forced .profiles-horizontal::-webkit-scrollbar-thumb:hover {
+  background: #666666 !important;
+}
+
+/* Mantener elementos que deben ser de colores específicos */
+.light-theme-forced .page-title-banner,
+.light-theme-forced .page-title-banner * {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+  color: white !important;
+}
+
+.light-theme-forced .export-btn {
+  background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%) !important;
+  color: white !important;
+}
+
+.light-theme-forced .profile-age {
+  color: #7c3aed !important;
+  background: rgba(124, 58, 237, 0.1) !important;
+  border: 1px solid rgba(124, 58, 237, 0.2) !important;
+}
+
+.light-theme-forced .profile-circle.selected .profile-age {
+  background: #7c3aed !important;
+  color: white !important;
+  border-color: #7c3aed !important;
+}
+
+/* Asegurar que TODOS los elementos hereden los colores claros */
+.light-theme-forced * {
+  color: inherit !important;
+}
+
+/* Sobrescribir cualquier color oscuro que pueda estar aplicándose */
+.light-theme-forced
+  *:not(.page-title-banner):not(.page-title-banner *):not(.export-btn):not(.period-btn.active):not(
+    .profile-circle.selected .profile-age
+  ) {
+  background-color: inherit !important;
+  color: inherit !important;
+}
+
+/* Forzar colores específicos para elementos que podrían tener CSS conflictivo */
+.light-theme-forced .profiles-section-container {
+  background: transparent !important;
+}
+
+.light-theme-forced .main-stats {
+  background: transparent !important;
+}
+
+.light-theme-forced .charts-section {
+  background: transparent !important;
+}
+
+.light-theme-forced .export-section {
+  background: transparent !important;
+}
+
+/* Asegurar que los inputs y selects también usen colores claros */
+.light-theme-forced input,
+.light-theme-forced select,
+.light-theme-forced textarea {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.light-theme-forced input::placeholder {
+  color: #666666 !important;
+}
+
+/* Forzar colores para cualquier elemento que pueda estar usando variables CSS incorrectas */
+.light-theme-forced .profile-circle {
+  color: #333333 !important;
+}
+
+.light-theme-forced .profile-circle:hover {
+  background: rgba(124, 58, 237, 0.05) !important;
+}
+
+.light-theme-forced .profile-circle.selected {
+  background: rgba(124, 58, 237, 0.08) !important;
+}
+
+/* Asegurar que los cambios de estadísticas usen colores apropiados */
+.light-theme-forced .stat-change.positive {
+  color: #10b981 !important;
+  background: rgba(16, 185, 129, 0.1) !important;
+}
+
+.light-theme-forced .stat-change.negative {
+  color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
+.light-theme-forced .stat-change.neutral {
+  color: #666666 !important;
+  background: rgba(107, 114, 128, 0.1) !important;
 }

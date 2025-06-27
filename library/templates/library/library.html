@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
-
+{% block title %}Biblioteca - CuentIA{% endblock %}
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/library.css' %}?v=5">
-<!-- Asegurar que FontAwesome esté cargado -->
+<link rel="stylesheet" href="{% static 'css/library/library.css' %}?v=5">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 {% endblock %}
 
@@ -125,7 +124,6 @@
                     </div>
 
                     <div class="card-actions">
-                        <!-- REMOVIDO onclick - Ahora manejado por event listeners -->
                         <button class="card-action-btn favorite-btn {% if cuento.es_favorito %}active{% endif %}"
                                 data-cuento-id="{{ cuento.id }}"
                                 title="{% if cuento.es_favorito %}Quitar de favoritos{% else %}Añadir a favoritos{% endif %}">
@@ -149,21 +147,17 @@
                     </div>
 
                     <div class="card-buttons">
-                        <!-- REMOVIDO onclick - Ahora manejado por event listeners -->
                         <a href="{% url 'stories:generated_story' cuento.id %}" class="card-btn btn-primary" data-cuento-id="{{ cuento.id }}">
                             <i class="fas fa-book-open"></i> LEER
                         </a>
-                        <!-- REMOVIDO onclick - Ahora manejado por event listeners -->
                         <button class="card-btn btn-secondary play-story"
                                 data-cuento-id="{{ cuento.id }}"
                                 data-cuento-titulo="{{ cuento.titulo }}">
                             <i class="fas fa-play"></i> ESCUCHAR
                         </button>
-                        <!-- CORREGIDO: Usar la URL de stories para descarga -->
                         <a href="{% url 'stories:descargar_pdf' cuento.id %}" class="card-btn btn-outline" target="_blank">
                             <i class="fas fa-download"></i> DESCARGAR
                         </a>
-                        <!-- REMOVIDO onclick - Ahora manejado por event listeners -->
                         <button class="card-btn btn-danger delete-story"
                                 data-cuento-id="{{ cuento.id }}"
                                 data-cuento-titulo="{{ cuento.titulo }}">
@@ -190,12 +184,10 @@
     </div>
 </div>
 
-<!-- MODAL DE CONFIRMACIÓN -->
 <div id="deleteModal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
             <h3>Confirmar Eliminación</h3>
-            <!-- REMOVIDO onclick - Ahora manejado por event listeners -->
             <button class="modal-close">
                 <i class="fas fa-times"></i>
             </button>
@@ -208,16 +200,13 @@
             <p class="warning-text">Esta acción no se puede deshacer.</p>
         </div>
         <div class="modal-footer">
-            <!-- REMOVIDO onclick - Ahora manejado por event listeners -->
             <button class="btn btn-secondary modal-cancel">Cancelar</button>
             <button class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
         </div>
     </div>
 </div>
 
-<!-- SOLO DATOS NECESARIOS PARA JAVASCRIPT -->
 <script>
-    // Datos mínimos necesarios para el JavaScript
     window.bibliotecaData = {
         titulos_disponibles: {{ titulos_disponibles|safe }},
         csrfToken: '{{ csrf_token }}'
@@ -225,15 +214,13 @@
 </script>
 
 <script>
-  // Script inline para garantizar que los botones del modal funcionen
   document.addEventListener('DOMContentLoaded', function() {
-    console.log("🔍 Configurando event listeners del modal directamente en el HTML");
+    console.log("Configurando event listeners del modal directamente en el HTML");
 
-    // Configurar botón cancelar
     document.addEventListener('click', function(e) {
       if (e.target && (e.target.classList.contains('modal-cancel') ||
           (e.target.parentElement && e.target.parentElement.classList.contains('modal-cancel')))) {
-        console.log("🚫 Botón cancelar clickeado");
+        console.log("Botón cancelar clickeado");
         const modal = document.getElementById('deleteModal');
         if (modal) {
           modal.style.display = 'none';
@@ -243,11 +230,10 @@
       }
     });
 
-    // Configurar botón X para cerrar
     document.addEventListener('click', function(e) {
       if (e.target && (e.target.classList.contains('modal-close') ||
           (e.target.parentElement && e.target.parentElement.classList.contains('modal-close')))) {
-        console.log("❌ Botón cerrar (X) clickeado");
+        console.log("Botón cerrar (X) clickeado");
         const modal = document.getElementById('deleteModal');
         if (modal) {
           modal.style.display = 'none';
@@ -257,7 +243,6 @@
       }
     });
 
-    // Cerrar modal al hacer click fuera
     window.addEventListener('click', function(e) {
       const modal = document.getElementById('deleteModal');
       if (e.target === modal) {
@@ -269,7 +254,7 @@
     // Cerrar modal con tecla Escape
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
-        console.log("⌨️ Tecla Escape presionada");
+        console.log("Tecla Escape presionada");
         const modal = document.getElementById('deleteModal');
         if (modal && modal.style.display === 'flex') {
           modal.style.display = 'none';
@@ -281,6 +266,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- SOLO CARGAR NUESTRO JAVASCRIPT EXTERNO -->
 <script src="{% static 'js/library.js' %}?v=5"></script>
 {% endblock %}

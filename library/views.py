@@ -34,11 +34,10 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def export_reading_report(request):
-    """Vista para exportar reporte de lectura - CORREGIDA PARA MANEJAR ERRORES"""
     try:
-        print(f"🔄 === EXPORT_READING_REPORT ===")
-        print(f"👤 Usuario: {request.user.username}")
-        print(f"📊 Parámetros GET: {dict(request.GET)}")
+        print(f"=== EXPORT_READING_REPORT ===")
+        print(f"Usuario: {request.user.username}")
+        print(f"Parámetros GET: {dict(request.GET)}")
 
         # Verificar que la función de generación esté disponible
         if not generate_library_report:
@@ -51,7 +50,7 @@ def export_reading_report(request):
         period = request.GET.get('period', 'month')
         format_type = request.GET.get('format', 'pdf')
 
-        print(f"🔧 Parámetros procesados:")
+        print(f"Parámetros procesados:")
         print(f"  - Profile ID: {profile_id}")
         print(f"  - Period: {period}")
         print(f"  - Format: {format_type}")
@@ -67,16 +66,16 @@ def export_reading_report(request):
         if profile_id and profile_id != 'all':
             try:
                 perfil = get_object_or_404(Perfil, id=profile_id, usuario=request.user)
-                print(f"👤 Perfil encontrado: {perfil.nombre}")
+                print(f"Perfil encontrado: {perfil.nombre}")
             except Exception as e:
                 logger.error(f"Error getting profile {profile_id}: {e}")
-                print(f"❌ Error obteniendo perfil: {e}")
+                print(f"Error obteniendo perfil: {e}")
                 perfil = None
 
         # Generar reporte según formato
         if format_type == 'pdf':
             try:
-                print(f"📄 Generando PDF...")
+                print(f"Generando PDF...")
 
                 # Generar PDF con manejo de errores robusto
                 pdf_data = generate_library_report(request.user, perfil, period, 'pdf')
@@ -89,7 +88,7 @@ def export_reading_report(request):
                 if not pdf_data.startswith(b'%PDF'):
                     raise Exception("Los datos generados no son un PDF válido")
 
-                print(f"✅ PDF generado exitosamente: {len(pdf_data)} bytes")
+                print(f"PDF generado exitosamente: {len(pdf_data)} bytes")
 
                 # Crear respuesta HTTP
                 response = HttpResponse(pdf_data, content_type='application/pdf')
@@ -102,13 +101,13 @@ def export_reading_report(request):
                 response['Content-Disposition'] = f'attachment; filename="{filename}"'
                 response['Content-Length'] = len(pdf_data)
 
-                logger.info(f"✅ PDF report exported successfully for {request.user.username}")
-                print(f"✅ ÉXITO: Reporte PDF exportado")
+                logger.info(f"PDF report exported successfully for {request.user.username}")
+                print(f"ÉXITO: Reporte PDF exportado")
                 return response
 
             except Exception as e:
-                logger.error(f"❌ Error generating PDF: {str(e)}")
-                print(f"❌ ERROR PDF: {str(e)}")
+                logger.error(f"Error generating PDF: {str(e)}")
+                print(f"ERROR PDF: {str(e)}")
 
                 # Intentar generar un PDF de error
                 try:
@@ -140,13 +139,13 @@ def export_reading_report(request):
                     return response
 
                 except Exception as pdf_error:
-                    logger.error(f"❌ Error creating error PDF: {pdf_error}")
+                    logger.error(f"Error creating error PDF: {pdf_error}")
                     messages.error(request, f'Error al generar el reporte: {str(e)}')
                     return redirect('library:reading_tracker')
 
         elif format_type == 'json':
             try:
-                print(f"📊 Generando JSON...")
+                print(f"Generando JSON...")
 
                 # Generar JSON
                 json_data = generate_library_report(request.user, perfil, period, 'json')
@@ -154,13 +153,13 @@ def export_reading_report(request):
                 response = JsonResponse(json_data, safe=False)
                 response['Content-Disposition'] = 'attachment; filename="reading_report.json"'
 
-                logger.info(f"✅ JSON report exported successfully for {request.user.username}")
-                print(f"✅ ÉXITO: Reporte JSON exportado")
+                logger.info(f"JSON report exported successfully for {request.user.username}")
+                print(f"ÉXITO: Reporte JSON exportado")
                 return response
 
             except Exception as e:
-                logger.error(f"❌ Error generating JSON: {str(e)}")
-                print(f"❌ ERROR JSON: {str(e)}")
+                logger.error(f"Error generating JSON: {str(e)}")
+                print(f"ERROR JSON: {str(e)}")
                 return JsonResponse({
                     'error': True,
                     'message': f'Error al generar reporte JSON: {str(e)}'
@@ -172,8 +171,8 @@ def export_reading_report(request):
             return redirect('library:reading_tracker')
 
     except Exception as e:
-        logger.error(f"❌ Critical error in export_reading_report: {str(e)}")
-        print(f"❌ ERROR CRÍTICO: {str(e)}")
+        logger.error(f"Critical error in export_reading_report: {str(e)}")
+        print(f"ERROR CRÍTICO: {str(e)}")
 
         # Respuesta de error para AJAX
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -190,11 +189,9 @@ def export_reading_report(request):
 # Mantener todas las demás vistas existentes...
 @login_required
 def library_view(request):
-    """Main library view - CORREGIDA PARA MANTENER FILTROS"""
     try:
         print("Library view called")
 
-        # Get user profiles for filter
         perfiles = Perfil.objects.filter(usuario=request.user).order_by('nombre')
         print(f"Found {perfiles.count()} profiles")
 
@@ -253,13 +250,12 @@ def library_view(request):
         elif ordenar_por == 'favoritos':
             # CORREGIDO: Filtrar solo cuentos marcados como favoritos
             cuentos = cuentos.filter(es_favorito=True).order_by('-fecha_creacion')
-            print(f"🌟 Filtrando solo favoritos: {cuentos.count()} cuentos encontrados")
+            print(f" Filtrando solo favoritos: {cuentos.count()} cuentos encontrados")
         else:
             cuentos = cuentos.order_by('-fecha_creacion')
 
         print(f"Found {cuentos.count()} stories after filters")
 
-        # Get all unique themes from user's stories IN LIBRARY
         # Si hay perfil seleccionado, obtener solo temas de ese perfil
         if perfil_seleccionado:
             temas_disponibles = Cuento.objects.filter(
@@ -284,13 +280,13 @@ def library_view(request):
                                                       en_biblioteca=True).count()
 
         if cuentos_completados > 0 and cuentos_en_biblioteca == 0:
-            print("🔄 Migrando cuentos existentes a biblioteca...")
+            print("Migrando cuentos existentes a biblioteca...")
             migrated = Cuento.objects.filter(
                 usuario=request.user,
                 estado='completado',
                 en_biblioteca=False
             ).update(en_biblioteca=True)
-            print(f"✅ {migrated} cuentos migrados automáticamente")
+            print(f"{migrated} cuentos migrados automáticamente")
 
         # Pagination
         paginator = Paginator(cuentos, 12)
@@ -327,13 +323,12 @@ def library_view(request):
 
 @login_required
 def reading_tracker_view(request):
-    """Vista principal del seguimiento lector - CORREGIDA PARA EVITAR ERROR DE PIPE"""
     try:
         # Get user profiles
         perfiles = Perfil.objects.filter(usuario=request.user).order_by('nombre')
 
-        print(f"📊 Cargando seguimiento lector para {request.user.username}")
-        print(f"👥 Perfiles encontrados: {perfiles.count()}")
+        print(f"Cargando seguimiento lector para {request.user.username}")
+        print(f"Perfiles encontrados: {perfiles.count()}")
 
         # USAR SOLO ESTADÍSTICAS BÁSICAS PARA EVITAR ERROR DE PIPE
         # Calcular estadísticas directamente desde la base de datos
@@ -394,9 +389,9 @@ def reading_tracker_view(request):
             tema_favorito = tema_counts[0]['tema'].title() if tema_counts[0]['tema'] else "Sin datos"
             temas_explorados = len(tema_counts)
 
-        print(f"📈 Estadísticas calculadas: {total_cuentos} cuentos totales")
-        print(f"⏱️ Tiempo de lectura: {tiempo_formateado}")
-        print(f"🎯 Tema favorito: {tema_favorito}")
+        print(f"Estadísticas calculadas: {total_cuentos} cuentos totales")
+        print(f"Tiempo de lectura: {tiempo_formateado}")
+        print(f"Tema favorito: {tema_favorito}")
 
         # Preparar contexto con datos seguros
         context = {
@@ -414,7 +409,7 @@ def reading_tracker_view(request):
         return render(request, 'library/reading_tracker.html', context)
 
     except Exception as e:
-        print(f"❌ Error en reading_tracker_view: {str(e)}")
+        print(f"Error en reading_tracker_view: {str(e)}")
         logger.error(f"Error in reading_tracker_view: {str(e)}")
 
         # En caso de error, mostrar datos básicos
@@ -438,12 +433,12 @@ def reading_tracker_view(request):
 def get_profile_stats(request, profile_id=None):
     """API para obtener estadísticas de un perfil específico - VERSIÓN FINAL CORREGIDA"""
     try:
-        print(f"\n🔍 === GET_PROFILE_STATS DEBUG ===")
-        print(f"👤 Usuario logueado: {request.user.username}")
-        print(f"🆔 Profile ID: {profile_id}")
+        print(f"\n === GET_PROFILE_STATS DEBUG ===")
+        print(f"Usuario logueado: {request.user.username}")
+        print(f"Profile ID: {profile_id}")
 
         period = request.GET.get('period', 'week')
-        print(f"📅 Período: {period}")
+        print(f"Período: {period}")
 
         # CALCULAR ESTADÍSTICAS MANUALMENTE (más confiable)
         from django.db import models
@@ -466,9 +461,9 @@ def get_profile_stats(request, profile_id=None):
                 perfil_obj = get_object_or_404(Perfil, id=profile_id, usuario=request.user)
                 cuentos_filter['perfil'] = perfil_obj
                 stats_filter['perfil'] = perfil_obj
-                print(f"👤 Filtrando por perfil: {perfil_obj.nombre}")
+                print(f"Filtrando por perfil: {perfil_obj.nombre}")
             except:
-                print(f"❌ Perfil {profile_id} no encontrado")
+                print(f"Perfil {profile_id} no encontrado")
 
         # Filtrar por período
         fecha_limite = None
@@ -484,7 +479,7 @@ def get_profile_stats(request, profile_id=None):
             # Para cuentos usamos fecha_creacion
             cuentos_filter['fecha_creacion__gte'] = fecha_limite
 
-        print(f"📅 Fecha límite: {fecha_limite}")
+        print(f"Fecha límite: {fecha_limite}")
 
         # OBTENER DATOS
         cuentos = Cuento.objects.filter(**cuentos_filter)
@@ -495,8 +490,8 @@ def get_profile_stats(request, profile_id=None):
             total=models.Sum('tiempo_lectura')
         )['total'] or 0
 
-        print(f"📚 Cuentos encontrados: {total_cuentos}")
-        print(f"⏱️ Tiempo total: {total_tiempo_segundos} segundos")
+        print(f"Cuentos encontrados: {total_cuentos}")
+        print(f"Tiempo total: {total_tiempo_segundos} segundos")
 
         # Formatear tiempo
         if total_tiempo_segundos >= 3600:
@@ -530,8 +525,8 @@ def get_profile_stats(request, profile_id=None):
             tema_favorito = tema_counts[0]['tema'].title()
             temas_explorados = len(tema_counts)
 
-        print(f"🎯 Tema favorito: {tema_favorito}")
-        print(f"🎨 Temas explorados: {temas_explorados}")
+        print(f"Tema favorito: {tema_favorito}")
+        print(f"Temas explorados: {temas_explorados}")
 
         # DATOS PARA GRÁFICAS - USAR FECHA DE CREACIÓN DE CUENTOS EN LUGAR DE ESTADÍSTICAS
 
@@ -568,12 +563,12 @@ def get_profile_stats(request, profile_id=None):
             # Obtener la fecha actual en la zona horaria local
             ahora_local = timezone.localtime(timezone.now())
             hoy_local = ahora_local.date()
-            print(f"🗓️ Fecha actual local: {hoy_local}")
-            print(f"🕐 Hora actual local: {ahora_local}")
+            print(f"Fecha actual local: {hoy_local}")
+            print(f"Hora actual local: {ahora_local}")
 
             for i in range(min(days_range, 30)):
                 fecha_objetivo = hoy_local - timedelta(days=i)
-                print(f"📅 Procesando fecha: {fecha_objetivo}")
+                print(f"Procesando fecha: {fecha_objetivo}")
 
                 # CONTAR CUENTOS CREADOS EN ESA FECHA (usando fecha_creacion)
                 count = 0
@@ -583,15 +578,15 @@ def get_profile_stats(request, profile_id=None):
                     # Convertir fecha_creacion a fecha local
                     fecha_creacion_local = timezone.localtime(cuento.fecha_creacion).date()
                     print(
-                        f"  📖 Cuento '{cuento.titulo}' creado: {cuento.fecha_creacion} -> local: {fecha_creacion_local}")
+                        f"Cuento '{cuento.titulo}' creado: {cuento.fecha_creacion} -> local: {fecha_creacion_local}")
 
                     if fecha_creacion_local == fecha_objetivo:
                         count += 1
                         cuentos_del_dia.append(cuento.titulo)
 
-                print(f"📊 Cuentos para {fecha_objetivo}: {count}")
+                print(f"Cuentos para {fecha_objetivo}: {count}")
                 if cuentos_del_dia:
-                    print(f"  📚 Títulos: {cuentos_del_dia}")
+                    print(f"Títulos: {cuentos_del_dia}")
 
                 activity_data.append({
                     'date': fecha_objetivo.strftime('%Y-%m-%d'),
@@ -646,7 +641,7 @@ def get_profile_stats(request, profile_id=None):
             'reading_progress': reading_progress
         }
 
-        print(f"📤 Enviando respuesta:")
+        print(f"Enviando respuesta:")
         print(f"  - Total cuentos: {response_data['total_stories']}")
         print(f"  - Tiempo total: {response_data['total_reading_time']}")
         print(f"  - Tema favorito: {response_data['favorite_theme']}")
@@ -654,7 +649,7 @@ def get_profile_stats(request, profile_id=None):
         print(f"  - Temas: {len(theme_distribution)} categorías")
 
         # Debug de activity_data
-        print(f"📊 Activity data:")
+        print(f"Activity data:")
         for item in activity_data:
             print(f"  {item['date']}: {item['stories']} cuentos")
 
@@ -663,7 +658,7 @@ def get_profile_stats(request, profile_id=None):
         return JsonResponse(response_data)
 
     except Exception as e:
-        print(f"❌ ERROR: {str(e)}")
+        print(f"ERROR: {str(e)}")
         import traceback
         traceback.print_exc()
 
@@ -679,7 +674,6 @@ def get_profile_stats(request, profile_id=None):
 # Resto de vistas existentes sin cambios...
 @login_required
 def view_library_story(request, story_id):
-    """View to see a story from library"""
     try:
         story = get_object_or_404(
             Cuento,
@@ -714,7 +708,6 @@ def view_library_story(request, story_id):
 
 @login_required
 def update_reading_time(request):
-    """API para actualizar tiempo de lectura (AJAX) - MEJORADA"""
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
 
@@ -806,14 +799,12 @@ def update_reading_time(request):
 # Resto de las vistas existentes sin cambios...
 @login_required
 def debug_library_view(request):
-    """Debug view to test if routing works"""
     return HttpResponse("Library debug view is working! User: " + str(request.user.username))
 
 
 @login_required
 @require_POST
 def delete_story(request, story_id):
-    """View to delete a story from library - ACTUALIZADA CON AUDITORÍA"""
     try:
         story = get_object_or_404(
             Cuento,
@@ -823,7 +814,7 @@ def delete_story(request, story_id):
         )
         title = story.titulo
 
-        print(f"🗑️ ELIMINANDO DESDE LIBRARY: {story.titulo} (ID: {story.id})")
+        print(f"ELIMINANDO DESDE LIBRARY: {story.titulo} (ID: {story.id})")
 
         # NUEVO: Registrar en auditoría ANTES de eliminar
         try:
@@ -835,25 +826,22 @@ def delete_story(request, story_id):
             )
 
             if cuento_eliminado:
-                logger.info(f"✅ Cuento registrado en auditoría: {story.titulo} (ID: {story.id})")
-                print(f"✅ AUDITORÍA: Cuento '{story.titulo}' registrado correctamente")
+                logger.info(f"Cuento registrado en auditoría: {story.titulo} (ID: {story.id})")
+                print(f"AUDITORÍA: Cuento '{story.titulo}' registrado correctamente")
             else:
-                logger.warning(f"⚠️ No se pudo registrar en auditoría: {story.titulo} (ID: {story.id})")
-                print(f"⚠️ AUDITORÍA: Error registrando '{story.titulo}'")
+                logger.warning(f"No se pudo registrar en auditoría: {story.titulo} (ID: {story.id})")
+                print(f"AUDITORÍA: Error registrando '{story.titulo}'")
 
         except Exception as audit_error:
-            logger.error(f"❌ Error en auditoría para cuento {story.id}: {audit_error}")
-            print(f"❌ AUDITORÍA: Error - {audit_error}")
+            logger.error(f"Error en auditoría para cuento {story.id}: {audit_error}")
+            print(f"AUDITORÍA: Error - {audit_error}")
             # Continuar con la eliminación aunque falle la auditoría
-
-        # Also delete related statistics
         EstadisticaLectura.objects.filter(cuento=story).delete()
 
-        # Delete the story
         story.delete()
 
-        logger.info(f"🗑️ Cuento eliminado: {title} (ID: {story_id}) por usuario {request.user.username}")
-        print(f"🗑️ ELIMINACIÓN: '{title}' eliminado correctamente")
+        logger.info(f"Cuento eliminado: {title} (ID: {story_id}) por usuario {request.user.username}")
+        print(f"ELIMINACIÓN: '{title}' eliminado correctamente")
 
         return JsonResponse({
             'success': True,
@@ -870,22 +858,17 @@ def delete_story(request, story_id):
 
 @login_required
 def download_library_story(request, story_id):
-    """Download story as PDF from library - CORREGIDA"""
     try:
         story = get_object_or_404(
             Cuento,
             id=story_id,
             usuario=request.user,
             estado='completado',
-            en_biblioteca=True  # Solo descargar si está en biblioteca
+            en_biblioteca=True
         )
 
         logger.info(f"Descargando PDF desde biblioteca: {story.titulo}")
-
-        # Generate PDF using the function from utils
         pdf_buffer = generar_pdf_cuento(story)
-
-        # Create HTTP response with PDF
         response = HttpResponse(pdf_buffer.getvalue(), content_type='application/pdf')
         filename = f"CuentIA_{story.titulo.replace(' ', '_').replace('/', '_')}.pdf"
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
@@ -910,7 +893,6 @@ def download_library_story(request, story_id):
 
 @login_required
 def search_stories_ajax(request):
-    """AJAX view for real-time search in library"""
     query = request.GET.get('q', '').strip()
 
     if len(query) < 2:
@@ -920,7 +902,7 @@ def search_stories_ajax(request):
         stories = Cuento.objects.filter(
             usuario=request.user,
             estado='completado',
-            en_biblioteca=True,  # Solo buscar en biblioteca
+            en_biblioteca=True,
             titulo__icontains=query
         ).select_related('perfil')[:10]
 
@@ -937,7 +919,6 @@ def search_stories_ajax(request):
             })
 
         return JsonResponse({'stories': results})
-
     except Exception as e:
         logger.error(f"Error in AJAX search: {str(e)}")
         return JsonResponse({'stories': [], 'error': 'Error en la búsqueda'})
@@ -945,7 +926,6 @@ def search_stories_ajax(request):
 
 @login_required
 def filter_by_profile(request, profile_id):
-    """View to filter stories by specific profile"""
     try:
         profile = get_object_or_404(Perfil, id=profile_id, usuario=request.user)
 
@@ -953,13 +933,12 @@ def filter_by_profile(request, profile_id):
             usuario=request.user,
             perfil=profile,
             estado='completado',
-            en_biblioteca=True  # Solo cuentos en biblioteca
+            en_biblioteca=True
         ).order_by('-fecha_creacion')
 
         if not stories.exists():
             messages.info(request, f'El perfil "{profile.nombre}" no tiene cuentos guardados en la biblioteca.')
 
-        # Pagination
         paginator = Paginator(stories, 12)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
@@ -992,18 +971,14 @@ def filter_by_profile(request, profile_id):
 
 @login_required
 def library_statistics(request):
-    """View to show library statistics"""
     try:
         statistics = LibraryManager.get_library_statistics(request.user)
-
-        # Get most read stories
         popular_stories = Cuento.objects.filter(
             usuario=request.user,
             estado='completado',
             en_biblioteca=True
         ).order_by('-veces_leido')[:5] if hasattr(Cuento, 'veces_leido') else []
 
-        # Get recent activity
         recent_activity = EstadisticaLectura.objects.filter(
             usuario=request.user
         ).select_related('cuento').order_by('-fecha_lectura')[:10]
@@ -1025,7 +1000,6 @@ def library_statistics(request):
 @login_required
 @require_POST
 def toggle_library_favorite(request, story_id):
-    """AJAX view to toggle favorite from library"""
     try:
         story = get_object_or_404(
             Cuento,
@@ -1042,7 +1016,6 @@ def toggle_library_favorite(request, story_id):
             story.save()
             is_favorite = story.es_favorito
         else:
-            # If the field doesn't exist, assume it's not favorite
             is_favorite = False
 
         logger.info(f"Favorite {'added' if is_favorite else 'removed'}: {story.titulo}")
@@ -1064,7 +1037,6 @@ def toggle_library_favorite(request, story_id):
 # filtros de busqueda
 @login_required
 def get_themes_by_profile(request):
-    """AJAX view to get themes filtered by profile - MEJORADA"""
     profile_id = request.GET.get('profile_id')
 
     try:
@@ -1102,12 +1074,11 @@ def get_themes_by_profile(request):
 
 @login_required
 def search_titles_ajax(request):
-    """AJAX view for real-time title search with autocomplete - MEJORADA"""
     query = request.GET.get('q', '').strip()
     profile_id = request.GET.get('profile_id')
     theme = request.GET.get('theme')
 
-    if len(query) < 1:  # Permitir búsqueda desde 1 carácter
+    if len(query) < 1:
         return JsonResponse({'titles': []})
 
     try:
@@ -1146,7 +1117,6 @@ def search_titles_ajax(request):
 @login_required
 @require_http_methods(["POST"])
 def eliminar_cuento_con_auditoria(request, cuento_id):
-    """Vista para eliminar cuento y registrar en auditoría"""
     try:
         from stories.models import Cuento
 
@@ -1162,15 +1132,15 @@ def eliminar_cuento_con_auditoria(request, cuento_id):
         )
 
         if cuento_eliminado:
-            logger.info(f"✅ Cuento registrado en auditoría: {cuento.titulo}")
+            logger.info(f"Cuento registrado en auditoría: {cuento.titulo}")
         else:
-            logger.warning(f"⚠️ No se pudo registrar en auditoría: {cuento.titulo}")
+            logger.warning(f"No se pudo registrar en auditoría: {cuento.titulo}")
 
         # Eliminar el cuento
         titulo_eliminado = cuento.titulo
         cuento.delete()
 
-        logger.info(f"🗑️ Cuento eliminado: {titulo_eliminado} (ID: {cuento_id}) por usuario {request.user.username}")
+        logger.info(f"Cuento eliminado: {titulo_eliminado} (ID: {cuento_id}) por usuario {request.user.username}")
 
         return JsonResponse({
             'success': True,
@@ -1179,14 +1149,14 @@ def eliminar_cuento_con_auditoria(request, cuento_id):
         })
 
     except Cuento.DoesNotExist:
-        logger.warning(f"⚠️ Intento de eliminar cuento inexistente: {cuento_id}")
+        logger.warning(f"Intento de eliminar cuento inexistente: {cuento_id}")
         return JsonResponse({
             'success': False,
             'error': 'Cuento no encontrado'
         }, status=404)
 
     except Exception as e:
-        logger.error(f"❌ Error eliminando cuento {cuento_id}: {str(e)}")
+        logger.error(f"Error eliminando cuento {cuento_id}: {str(e)}")
         return JsonResponse({
             'success': False,
             'error': f'Error al eliminar cuento: {str(e)}'
@@ -1196,7 +1166,6 @@ def eliminar_cuento_con_auditoria(request, cuento_id):
 @login_required
 @require_http_methods(["GET"])
 def estadisticas_cuentos_eliminados(request):
-    """Vista para obtener estadísticas de cuentos eliminados"""
     try:
         # Parámetros
         time_period = request.GET.get('period', 'month')
@@ -1236,7 +1205,7 @@ def estadisticas_cuentos_eliminados(request):
         })
 
     except Exception as e:
-        logger.error(f"❌ Error obteniendo estadísticas de eliminados: {str(e)}")
+        logger.error(f"Error obteniendo estadísticas de eliminados: {str(e)}")
         return JsonResponse({
             'success': False,
             'error': str(e)
@@ -1246,14 +1215,13 @@ def estadisticas_cuentos_eliminados(request):
 @login_required
 @require_http_methods(["POST"])
 def eliminar_cuento(request, cuento_id):
-    """Vista ACTUALIZADA para eliminar cuento con sistema de auditoría"""
     try:
         from .models import Cuento
 
         # Obtener el cuento
         cuento = get_object_or_404(Cuento, id=cuento_id, usuario=request.user)
 
-        print(f"🗑️ ELIMINANDO: {cuento.titulo} (ID: {cuento.id})")
+        print(f"ELIMINANDO: {cuento.titulo} (ID: {cuento.id})")
 
         # NUEVO: Registrar en auditoría ANTES de eliminar
         try:
@@ -1267,23 +1235,23 @@ def eliminar_cuento(request, cuento_id):
             )
 
             if cuento_eliminado:
-                logger.info(f"✅ Cuento registrado en auditoría: {cuento.titulo} (ID: {cuento.id})")
-                print(f"✅ AUDITORÍA: Cuento '{cuento.titulo}' registrado correctamente")
+                logger.info(f"Cuento registrado en auditoría: {cuento.titulo} (ID: {cuento.id})")
+                print(f"AUDITORÍA: Cuento '{cuento.titulo}' registrado correctamente")
             else:
                 logger.warning(f"⚠️ No se pudo registrar en auditoría: {cuento.titulo} (ID: {cuento.id})")
-                print(f"⚠️ AUDITORÍA: Error registrando '{cuento.titulo}'")
+                print(f"AUDITORÍA: Error registrando '{cuento.titulo}'")
 
         except Exception as audit_error:
-            logger.error(f"❌ Error en auditoría para cuento {cuento.id}: {audit_error}")
-            print(f"❌ AUDITORÍA: Error - {audit_error}")
+            logger.error(f"Error en auditoría para cuento {cuento.id}: {audit_error}")
+            print(f"AUDITORÍA: Error - {audit_error}")
             # Continuar con la eliminación aunque falle la auditoría
 
         # Eliminar el cuento
         titulo_eliminado = cuento.titulo
         cuento.delete()
 
-        logger.info(f"🗑️ Cuento eliminado: {titulo_eliminado} (ID: {cuento_id}) por usuario {request.user.username}")
-        print(f"🗑️ ELIMINACIÓN: '{titulo_eliminado}' eliminado correctamente")
+        logger.info(f"Cuento eliminado: {titulo_eliminado} (ID: {cuento_id}) por usuario {request.user.username}")
+        print(f"ELIMINACIÓN: '{titulo_eliminado}' eliminado correctamente")
 
         return JsonResponse({
             'success': True,
@@ -1292,14 +1260,14 @@ def eliminar_cuento(request, cuento_id):
         })
 
     except Cuento.DoesNotExist:
-        logger.warning(f"⚠️ Intento de eliminar cuento inexistente: {cuento_id}")
+        logger.warning(f"Intento de eliminar cuento inexistente: {cuento_id}")
         return JsonResponse({
             'success': False,
             'error': 'Cuento no encontrado'
         }, status=404)
 
     except Exception as e:
-        logger.error(f"❌ Error eliminando cuento {cuento_id}: {str(e)}")
+        logger.error(f"Error eliminando cuento {cuento_id}: {str(e)}")
         return JsonResponse({
             'success': False,
             'error': f'Error al eliminar cuento: {str(e)}'

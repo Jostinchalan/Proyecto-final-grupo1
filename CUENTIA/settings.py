@@ -71,13 +71,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "CUENTIA.wsgi.application"
 
-# Database
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if os.getenv('USE_SQLITE', 'False') == 'True':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+      'default': {
+          'ENGINE': 'django.db.backends.postgresql',
+          'NAME': 'cuentia1',
+          'USER': 'usercuentia',
+          'PASSWORD': 'CuentIA12345-6789.',
+          'HOST': 'db-cuentia-1.cheu2sogwshp.us-east-2.rds.amazonaws.com',
+          'PORT': '5432',
+       }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

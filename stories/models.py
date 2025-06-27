@@ -25,14 +25,14 @@ class Cuento(models.Model):
 
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     perfil = models.ForeignKey(Perfil, on_delete=models.SET_NULL, null=True, blank=True)
-    titulo = models.CharField(max_length=200)
-    personaje_principal = models.CharField(max_length=100)
+    titulo = models.TextField()
+    personaje_principal = models.TextField()
     tema = models.CharField(max_length=50, choices=TEMA_CHOICES)
     edad = models.CharField(max_length=20)
     longitud = models.CharField(max_length=20)
     contenido = models.TextField(blank=True)
     moraleja = models.TextField(blank=True)
-    imagen_url = models.URLField(blank=True, null=True)
+    imagen_url = models.TextField(blank=True, null=True)
     imagen_prompt = models.TextField(blank=True)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='generando')
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -78,7 +78,7 @@ class EstadisticaLectura(models.Model):
     perfil = models.ForeignKey(Perfil, on_delete=models.SET_NULL, null=True, blank=True)
     fecha_lectura = models.DateTimeField(auto_now_add=True)
     tiempo_lectura = models.IntegerField(default=0)  # en segundos
-    tipo_lectura = models.CharField(max_length=20, choices=TIPO_LECTURA_CHOICES, default='texto')
+    tipo_lectura = models.TextField()
 
     class Meta:
         verbose_name = "Estadística de Lectura"

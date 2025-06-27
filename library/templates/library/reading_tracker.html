@@ -25,7 +25,7 @@
         <div class="profiles-section-box">
             <h2>Selecciona un perfil</h2>
             <div class="profiles-horizontal">
-                <!-- PERFIL "TODOS" PRIMERO -->
+                <!-- PERFIL "TODOS"-->
                 <div class="profile-circle selected" data-profile-id="all" onclick="selectProfile('all')">
                     <div class="profile-avatar-circle all-profiles">
                         <span style="font-size: 24px;">👨‍👩‍👧‍👦</span>
@@ -36,7 +36,7 @@
                     </div>
                 </div>
 
-                <!-- PERFILES INDIVIDUALES DESPUÉS -->
+                <!-- PERFILES INDIVIDUALES-->
                 {% for profile in profiles %}
                     <div class="profile-circle" data-profile-id="{{ profile.id }}" onclick="selectProfile('{{ profile.id }}')">
                         <div class="profile-avatar-circle">
@@ -89,7 +89,7 @@
     <!-- Estadísticas principales -->
     <div class="main-stats">
         <div class="stat-card">
-            <div class="stat-icon">📚</div>
+            <div class="stat-icon"></div>
             <div class="stat-content">
                 <h3 id="total-stories">{{ total_stories|default:0 }}</h3>
                 <p>Total de Cuentos</p>
@@ -98,7 +98,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon">⏱️</div>
+            <div class="stat-icon"></div>
             <div class="stat-content">
                 <h3 id="reading-time">{{ reading_time|default:"0s" }}</h3>
                 <p>Tiempo de Lectura</p>
@@ -107,7 +107,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon">📖</div>
+            <div class="stat-icon"></div>
             <div class="stat-content">
                 <h3 id="stories-per-week">{{ stories_per_week|default:0 }}</h3>
                 <p>Cuentos por Semana</p>
@@ -116,7 +116,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon">🎯</div>
+            <div class="stat-icon"></div>
             <div class="stat-content">
                 <h3 id="favorite-theme">{{ favorite_theme|default:"Sin datos" }}</h3>
                 <p>Tema Favorito</p>

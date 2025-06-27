@@ -7,40 +7,31 @@ from datetime import timedelta
 
 
 class LibraryQuerySet(models.QuerySet):
-    """Custom QuerySet for library operations"""
-
     def completed(self):
-        """Filter only completed stories"""
         return self.filter(estado='completado')
 
     def in_library(self):
-        """Filter only stories in library"""
         return self.filter(en_biblioteca=True)
 
     def by_user(self, user):
-        """Filter stories by specific user"""
         return self.filter(usuario=user)
 
     def by_profile(self, profile_id):
-        """Filter by specific profile"""
         if profile_id and profile_id != 'todos':
             return self.filter(perfil_id=profile_id)
         return self
 
     def by_theme(self, theme):
-        """Filter by theme"""
         if theme and theme != 'todos':
             return self.filter(tema__icontains=theme)
         return self
 
     def search_title(self, title):
-        """Search by title"""
         if title:
             return self.filter(titulo__icontains=title)
         return self
 
     def order_by_date(self, order_by):
-        """Order by date criteria"""
         if order_by == 'semana_anterior':
             date_limit = timezone.now() - timedelta(days=7)
             return self.filter(fecha_creacion__gte=date_limit)
@@ -55,7 +46,6 @@ class LibraryQuerySet(models.QuerySet):
 
 # NUEVO MODELO: Sistema de auditoría para cuentos eliminados
 class CuentoEliminado(models.Model):
-    """Modelo para registrar cuentos eliminados - Sistema de Auditoría"""
 
     # Información del cuento eliminado
     cuento_id_original = models.IntegerField(help_text="ID original del cuento eliminado")
@@ -128,11 +118,9 @@ class CuentoEliminado(models.Model):
 
 
 class LibraryManager:
-    """Manager for library operations using the existing Cuento model - MEJORADO"""
 
     @staticmethod
     def get_library_stories(user):
-        """Get all completed stories from user for the library"""
         try:
             return Cuento.objects.filter(
                 usuario=user,
@@ -147,7 +135,6 @@ class LibraryManager:
 
     @staticmethod
     def get_user_themes(user):
-        """Get all unique themes from user's stories IN LIBRARY"""
         try:
             return Cuento.objects.filter(
                 usuario=user,
@@ -162,7 +149,6 @@ class LibraryManager:
 
     @staticmethod
     def get_user_years(user):
-        """Get all creation years from user's stories IN LIBRARY"""
         try:
             return Cuento.objects.filter(
                 usuario=user,
@@ -177,7 +163,6 @@ class LibraryManager:
 
     @staticmethod
     def filter_library_stories(user, filters=None):
-        """Filter library stories by criteria - MEJORADO"""
         if filters is None:
             filters = {}
 
@@ -188,7 +173,6 @@ class LibraryManager:
                 en_biblioteca=True
             ).select_related('perfil')
 
-            # Apply filters
             profile_id = filters.get('perfil')
             if profile_id and profile_id != 'todos':
                 queryset = queryset.filter(perfil_id=profile_id)
@@ -222,7 +206,6 @@ class LibraryManager:
 
     @staticmethod
     def search_stories_ajax(user, query):
-        """AJAX search for stories IN LIBRARY - MEJORADO"""
         if len(query) < 2:
             return Cuento.objects.none()
 
@@ -241,7 +224,6 @@ class LibraryManager:
 
     @staticmethod
     def get_library_statistics(user):
-        """Get library statistics for the user - MEJORADO"""
         try:
             stories = Cuento.objects.filter(
                 usuario=user,
@@ -278,7 +260,6 @@ class LibraryManager:
 
     @staticmethod
     def registrar_cuento_eliminado(cuento, usuario, request=None, motivo='usuario'):
-        """NUEVA FUNCIÓN: Registrar un cuento como eliminado en el sistema de auditoría"""
         try:
             # Obtener información adicional del request si está disponible
             ip_eliminacion = None
@@ -312,12 +293,12 @@ class LibraryManager:
             import logging
             logger = logging.getLogger(__name__)
             logger.info(
-                f"✅ Cuento eliminado registrado: {cuento.titulo} (ID: {cuento.id}) por usuario {usuario.username}")
+                f"Cuento eliminado registrado: {cuento.titulo} (ID: {cuento.id}) por usuario {usuario.username}")
 
             return cuento_eliminado
 
         except Exception as e:
             import logging
             logger = logging.getLogger(__name__)
-            logger.error(f"❌ Error registrando cuento eliminado: {e}")
+            logger.error(f"Error registrando cuento eliminado: {e}")
             return None

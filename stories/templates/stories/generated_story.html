@@ -2,9 +2,8 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/generated_story.css' %}">
+<link rel="stylesheet" href="{% static 'css/stories/generated_story.css' %}">
 {% endblock %}
-
 {% block content %}
 <div class="story-container" data-story-id="{{ cuento.id }}" {% if cuento.perfil %}data-profile-id="{{ cuento.perfil.id }}"{% endif %}>
     {% csrf_token %}

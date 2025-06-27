@@ -22,7 +22,6 @@ logger = logging.getLogger(__name__)
 
 
 def get_ecuador_time():
-    """Obtener la hora actual en zona horaria de Ecuador (UTC-5)"""
     try:
         ecuador_tz = pytz.timezone('America/Guayaquil')
         utc_now = timezone.now()
@@ -34,7 +33,6 @@ def get_ecuador_time():
 
 
 def format_ecuador_datetime(dt=None, include_time=True):
-    """Formatear fecha y hora en zona horaria de Ecuador"""
     try:
         if dt is None:
             dt = get_ecuador_time()
@@ -59,7 +57,6 @@ def format_ecuador_datetime(dt=None, include_time=True):
 
 
 def get_time_range_ecuador(time_period):
-    """Obtener rango de fechas basado en período usando zona horaria de Ecuador - CORREGIDO"""
     try:
         now_ecuador = get_ecuador_time()
 
@@ -90,12 +87,11 @@ def get_time_range_ecuador(time_period):
 
 
 def get_reading_statistics(user, perfil=None, time_period='week'):
-    """Obtener estadísticas de lectura para un usuario o perfil específico - CORREGIDA"""
     try:
         start_date, end_date = get_time_range_ecuador(time_period)
 
-        print(f"📊 Calculando estadísticas para período: {time_period}")
-        print(f"📅 Rango de fechas: {start_date} - {end_date}")
+        print(f"Calculando estadísticas para período: {time_period}")
+        print(f"Rango de fechas: {start_date} - {end_date}")
 
         # Filtros base con manejo de errores
         sessions_filter = Q(usuario=user)
@@ -104,7 +100,7 @@ def get_reading_statistics(user, perfil=None, time_period='week'):
         if perfil:
             sessions_filter &= Q(perfil=perfil)
             stories_filter &= Q(perfil=perfil)
-            print(f"👤 Filtrando por perfil: {perfil.nombre}")
+            print(f"Filtrando por perfil: {perfil.nombre}")
 
         if start_date:
             sessions_filter &= Q(fecha_lectura__gte=start_date)
@@ -119,8 +115,8 @@ def get_reading_statistics(user, perfil=None, time_period='week'):
             sessions = EstadisticaLectura.objects.none()
             stories = Cuento.objects.none()
 
-        print(f"📚 Cuentos encontrados: {stories.count()}")
-        print(f"📖 Sesiones de lectura: {sessions.count()}")
+        print(f"Cuentos encontrados: {stories.count()}")
+        print(f"Sesiones de lectura: {sessions.count()}")
 
         total_stories = stories.count()
 
@@ -244,7 +240,7 @@ def get_reading_statistics(user, perfil=None, time_period='week'):
             'theme_distribution': list(theme_counts[:10])
         }
 
-        print(f"✅ Estadísticas calculadas: {result}")
+        print(f"Estadísticas calculadas: {result}")
         return result
 
     except Exception as e:
@@ -267,16 +263,15 @@ def get_reading_statistics(user, perfil=None, time_period='week'):
 
 
 def get_chart_data(user, perfil=None, time_period='week'):
-    """Obtener datos para gráficos de D3.js - CORREGIDA PARA MANEJAR ERRORES"""
     try:
         start_date, end_date = get_time_range_ecuador(time_period)
 
-        print(f"📈 Generando datos de gráficas para período: {time_period}")
+        print(f"Generando datos de gráficas para período: {time_period}")
 
         base_filter = Q(usuario=user)
         if perfil:
             base_filter &= Q(perfil=perfil)
-            print(f"👤 Filtrando gráficas por perfil: {perfil.nombre}")
+            print(f"Filtrando gráficas por perfil: {perfil.nombre}")
         if start_date:
             base_filter &= Q(fecha_lectura__gte=start_date)
 
@@ -483,7 +478,7 @@ def get_chart_data(user, perfil=None, time_period='week'):
             'reading_progress': reading_progress
         }
 
-        print(f"📊 Datos de gráficas generados:")
+        print(f"Datos de gráficas generados:")
         print(f"  - Actividad: {len(activity_data)} puntos")
         print(f"  - Temas: {len(theme_distribution)} categorías")
         print(f"  - Progreso: {len(reading_progress)} puntos")
@@ -504,7 +499,7 @@ def generate_library_report(user, perfil=None, time_period='month', format_type=
     """Generar reporte de biblioteca en diferentes formatos - CORREGIDO"""
     try:
         print(
-            f"🔄 Generando reporte: usuario={user.username}, perfil={perfil}, período={time_period}, formato={format_type}")
+            f"Generando reporte: usuario={user.username}, perfil={perfil}, período={time_period}, formato={format_type}")
 
         # Obtener datos con manejo de errores
         try:
@@ -548,12 +543,11 @@ def generate_library_report(user, perfil=None, time_period='month', format_type=
 
 
 def get_deleted_stories(user, perfil=None, time_period='month'):
-    """Obtener cuentos eliminados del sistema de auditoría - CORREGIDO"""
     try:
         start_date, end_date = get_time_range_ecuador(time_period)
 
-        print(f"🗑️ Obteniendo cuentos eliminados para período: {time_period}")
-        print(f"📅 Rango de fechas: {start_date} - {end_date}")
+        print(f"Obteniendo cuentos eliminados para período: {time_period}")
+        print(f"Rango de fechas: {start_date} - {end_date}")
 
         deleted_stories = []
 
@@ -567,11 +561,11 @@ def get_deleted_stories(user, perfil=None, time_period='month'):
 
             if perfil:
                 queryset = queryset.filter(perfil=perfil)
-                print(f"👤 Filtrando eliminados por perfil: {perfil.nombre}")
+                print(f"Filtrando eliminados por perfil: {perfil.nombre}")
 
             cuentos_eliminados = queryset.order_by('-fecha_eliminacion')[:15]
 
-            print(f"🗑️ Cuentos eliminados encontrados: {cuentos_eliminados.count()}")
+            print(f"Cuentos eliminados encontrados: {cuentos_eliminados.count()}")
 
             for cuento_eliminado in cuentos_eliminados:
                 try:
@@ -591,12 +585,12 @@ def get_deleted_stories(user, perfil=None, time_period='month'):
             print(f"✅ {len(deleted_stories)} cuentos eliminados procesados para el reporte")
 
         except ImportError:
-            print("⚠️ Modelo CuentoEliminado no encontrado, usando método alternativo")
+            print("Modelo CuentoEliminado no encontrado, usando método alternativo")
             # Método alternativo más seguro
             deleted_stories = []
 
         except Exception as e:
-            print(f"❌ Error obteniendo cuentos eliminados: {str(e)}")
+            print(f"Error obteniendo cuentos eliminados: {str(e)}")
             logger.error(f"Error en get_deleted_stories: {str(e)}")
             deleted_stories = []
 
@@ -608,8 +602,6 @@ def get_deleted_stories(user, perfil=None, time_period='month'):
 
 
 class NumberedCanvas(canvas.Canvas):
-    """Canvas personalizado para agregar números de página y header/footer - CORREGIDO"""
-
     def __init__(self, *args, **kwargs):
         canvas.Canvas.__init__(self, *args, **kwargs)
         self._saved_page_states = []
@@ -627,12 +619,9 @@ class NumberedCanvas(canvas.Canvas):
         canvas.Canvas.save(self)
 
     def draw_page_number(self, page_num, total_pages):
-        """Dibujar número de página y elementos decorativos - CORREGIDO"""
         try:
-            # Header con color más profesional
             self.setFillColor(colors.HexColor('#374151'))
             self.rect(0, letter[1] - 60, letter[0], 60, fill=1, stroke=0)
-
             # Logo y título en header
             self.setFillColor(colors.white)
             self.setFont("Helvetica-Bold", 16)
@@ -659,7 +648,6 @@ class NumberedCanvas(canvas.Canvas):
 
 
 def generate_pdf_report(analytics, user, perfil, time_period):
-    """Generar reporte PDF con diseño profesional - CORREGIDO PARA MANEJAR ERRORES"""
     try:
         buffer = BytesIO()
 
